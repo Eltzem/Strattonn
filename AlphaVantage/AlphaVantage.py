@@ -11,7 +11,7 @@ Creates the filename to save a csv download as.
 def createQuoteFilename (_symbol, _timeSeries, _timeInterval=None):
     if _timeInterval == None:
         return _symbol + '_' + _timeSeries + '.csv'
-    else
+    else:
         return _symbol + '_' + _timeSeries + '_' + _timeInterval + '.csv'
 
 
@@ -31,11 +31,11 @@ def getQuotesCSV (_directory, _symbol, _timeSeries, _apiKey, _timeInterval=None)
 
     if _timeInterval == None:
         url = 'https://www.alphavantage.co/query?function=' + _timeSeries + '&symbol=' \
-                + _symbol + '&apikey=' + _apiKey + '&datatype=csv'
+                + _symbol + '&outputsize=full' + '&apikey=' + _apiKey + '&datatype=csv'
 
     else:
         url = 'https://www.alphavantage.co/query?function=' + _timeSeries + '&symbol=' \
-                + _symbol + '&interval=' + _timeInterval + '&apikey=' + _apiKey + '&datatype=csv' 
+                + _symbol + '&interval=' + _timeInterval + '&outputsize=full' + '&apikey=' + _apiKey + '&datatype=csv' 
 
     filename = createQuoteFilename(_symbol, _timeSeries, _timeInterval)
 
