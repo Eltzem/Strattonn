@@ -2,12 +2,16 @@
     system path differences.
 '''
 
-import platform.platform as pf
+import platform
 
 def create_data_dir_path ():
-    if 'Windows' in pf():
+    if 'Windows' in platform.platform():
         return '..\data'
     else:
         return '../data'
 
-
+def get_path_slash ():
+    if 'Windows' in platform.platform():
+        return '\\'
+    else:
+        return '/'
