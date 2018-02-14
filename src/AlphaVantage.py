@@ -78,7 +78,7 @@ def _append_data (_existing, _new):
     return
 
 # tested
-def _download_symbol_data (_dlDirectory, _filename, _symbol, _timeSeries, _timeInterval=None, _apiKey=APIKEY):
+def download_symbol_data (_dlDirectory, _filename, _symbol, _timeSeries, _timeInterval=None, _apiKey=APIKEY):
     
     # save current working directory
     oldPath = os.getcwd()
@@ -154,21 +154,24 @@ def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY)
 
         # download new data
         try:
-            _download_symbol_data (os.getcwd(), filenameTemp, _symbol, _timeSeries, \
+            download_symbol_data (os.getcwd(), filenameTemp, _symbol, _timeSeries, \
                     _timeInterval=_timeInterval, _apiKey=APIKEY)
         except Exception as e:
             raise e
 
         # format csv to our liking
         _format_csv(os.getcwd() + get_path_slash() + filenameTemp)
+
+        filenamePermanent = _symbol + '.csv'
 '''
         # append new data to existing if needed
-        if os.path.exists(_symbol + '.csv'):
+        if os.path.exists(_filenamePermanent):
             
 
         # else, this file is new. rename it to permanent name
         else:
-
+            os.rename(filenameTemp, filenamePermanent)
+        
         # restore current working directory
         os.chdir(oldPath)
 '''
