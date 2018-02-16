@@ -4,7 +4,7 @@
 
 import platform
 
-def create_data_dir_path ():
+def get_data_dir_path ():
     if 'Windows' in platform.platform():
         return '..\data'
     else:
