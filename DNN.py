@@ -15,7 +15,7 @@ class DNN:
         self.layers = None
         KerasBackend.clear_session()
 
-    def addDense (self, _perceptrons, _activation, _inputs=None, _dropoutRate=0):
+    def add_dense (self, _perceptrons, _activation, _inputs=None, _dropoutRate=0):
         print("adding dense perceptron layer")
 
         newLayer = Dense(_perceptrons, activation=_activation, input_shape=(_inputs,))
@@ -27,7 +27,7 @@ class DNN:
         if _dropoutRate > 0:
             self.addDropout(_dropoutRate)
 
-    def addDropout (self, _dropoutRate):
+    def add_dropout (self, _dropoutRate):
         print("adding dropout")
 
         # dropout of a layer functions as a layer in Keras
@@ -65,5 +65,5 @@ class DNN:
 
         return self.model.predict(x=_inputs)
 
-    def getLayers(self):
+    def get_layers(self):
         return self.layers

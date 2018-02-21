@@ -6,44 +6,102 @@ import random
 
 class Chromosome:
 
+    '''
+        Default constructor. Creates a random chromosome within certain bounds.
+    '''
+
     def __init__ (self):
         self.genome = []
+        
+        # Parameters for genome values
+
         self.MAX_HIDDEN_LAYERS = 7
 
+        self.minWindowSize = 1
+        self.maxWindowSize = 20 # arbitrary max
 
         self.minPerceptrons = 1
-        self.maxPerceptrons = 10001 # arbitrary max
+        self.maxPerceptrons = 10000 # arbitrary max
 
         self.minDropout = 0
         self.maxDropout = 1
 
         optimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
+        
         self.minLearningRate = 0.00001 # arbitrary min
         self.maxLearningRate = 1 # arbitrary max
         
         activations = ['softmax', 'elu', 'selu', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', \
                         'hard_sigmoid', 'linear']
-        #TODO create random genome here
 
-    def windowSize (self):
+        # Initialize random genome
+
+        self.genome.append(random.randint(self.minWindowSize, self.maxWindowSize))
+        self.genome.append(random.choice(optimizers))
+        self.genome.append(random.random() * self.maxLearningRate + self.minLearningRate)
+        self.genome.append(random.choice(optimizers))
+        self.genome.append(random.random() * self.maxDropout + self.minDropout)
+
+        # hidden layers
+        for x in range(self.MAX_HIDDEN_LAYERS):
+            self.genome.append(random.randint(self.minPerceptrons, self.maxPerceptrons))
+            self.genome.append(random.choice(activations))
+            self.genome.append(random.random() * self.maxDropout + self.minDropout)
+
+        # output activation function
+        self.genome.append(random.choice(activations))
+
+    '''
+        Returns string representation of the chromosome.
+    '''
+    def __str__ (self):
+        return str(self.genome)
+
+    '''
+        Returns window size of the DNN. This is the number of time periods fed as inputs to the network.
+    '''
+    def window_size (self):
         return self.genome[0]
 
+    '''
+        The optimizer used by the network. The optimizer controls the adjusting of weights.
+    '''
     def optimizer (self):
         return self.genome[1]
 
-    def learningRate (self):
+    '''
+        Returns the learning rate used by the optimizer to adjust weights.
+    '''
+    def learning_rate (self):
         return self.genome[2]
 
-    def inputActivation (self):
+    '''
+        Returns the activation function used on the input layer.
+    '''
+    def input_activation (self):
         return self.genome[3]
 
-    def inputDropout (self):
+    '''
+        Returns the dropout rate used on the input layer.
+    '''
+    def input_dropout (self):
         return self.genome[4]
 
-    def outputActivation (self):
+    '''
+        Returns the activation function used on the output layer.
+    '''
+    def output_activation (self):
         return self.genome(len(self.genome) - 1)
 
-    def hiddenLayers (self):
+    '''
+        Returns 3 lists containing information about the hidden layers. If a hidden layer has no
+        perceptrons, it is removed from this list.
+
+        Returns:sizes = list containing perceptron counts
+                activations = list containing activation functions
+                dropouts = list containing dropout rates
+    '''
+    def hidden_layers (self):
         sizes = []
         activations = []
         dropouts = []

@@ -5,9 +5,9 @@ from DNN import DNN
 model = DNN()
 
 # add layers
-model.addDense(32, 'relu', _inputs=5)
-model.addDense(100, 'softmax', _dropoutRate=0.1)
-model.addDense(1, 'elu')
+model.add_dense(32, 'relu', _inputs=5)
+model.add_dense(100, 'softmax', _dropoutRate=0.1)
+model.add_dense(1, 'elu')
 
 model.compile('adam', 'mean_squared_error', ['accuracy'])
 
@@ -27,17 +27,17 @@ prediction_outputs = [[2]]
 print(model.predict(prediction_inputs))
 
 
-if model.getLayers()[0].get_config()['batch_input_shape'] == (None, 5):
+if model.get_layers()[0].get_config()['batch_input_shape'] == (None, 5):
     print('input shape test passed')
 else:
     print('FAILED: input shape test')
 
-if model.getLayers()[1].get_config()['units'] == 100:
+if model.get_layers()[1].get_config()['units'] == 100:
     print('perceptron count test passed')
 else:
     print('FAILED: perceptron count test')
 
-if model.getLayers()[2].get_config()['activation'] == 'elu':
+if model.get_layers()[2].get_config()['activation'] == 'elu':
     print('activation function test passed')
 else:
     print('FAILED: activation function test')
