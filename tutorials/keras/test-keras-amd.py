@@ -1,6 +1,6 @@
 
 
-from keras.layers import Input, Dense
+from keras.layers import *
 from keras.models import Sequential
 
 import numpy as np
@@ -50,6 +50,7 @@ y_test = np.array(y_test)
 model = Sequential()
 model.add(Dense(30, input_shape=(3,), activation='relu'))
 model.add(Dense(30, activation='relu'))
+#model.add(Dropout(0))
 model.add(Dense(1, activation='relu'))
 model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
 

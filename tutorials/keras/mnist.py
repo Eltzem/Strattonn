@@ -29,7 +29,7 @@ def create_neural_network_model ():
     return model
 
 def train_neural_network_model (model, x, y):
-    model.compile(optimizer='adam', loss='mean_squared_error', metrics=[metrics.mae, metrics.categorical_accuracy])
+    model.compile(optimizer='adam', loss='mean_squared_error', metrics=[metrics.categorical_accuracy])
     model.fit(x=x, y=y, epochs=n_epochs, batch_size=batch_size, verbose=1)
 
 def test_neural_network_model (model, x, y):
@@ -129,5 +129,6 @@ y_test = np.array(y_test)
 
 model = create_neural_network_model()
 train_neural_network_model (model, x_train, y_train)
+print('testing')
 test_neural_network_model(model, x_test, y_test)
 

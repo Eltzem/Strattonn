@@ -1,7 +1,5 @@
 APIKEY = 'SM7GE35DSMNWSBPD' # hard code this for now
 
-#TODO add comments to places
-
 import urllib.request # download data
 from Paths import get_data_dir_path
 from Paths import get_path_slash
@@ -44,7 +42,8 @@ def _create_url (_symbol, _timeSeries, _timeInterval=None, _apiKey = APIKEY):
     return url
 
 '''
-    Takes a csv data file line and returns a datetime.datetime object with the date from that timestep.
+    Takes a formattedcsv data file line and returns a datetime.datetime object with the date from
+    that timestep.
 
     Args:   list _line = List directly from a formatted csv data file.
 
@@ -142,15 +141,16 @@ def _append_data (_filepathSource, _filepathTarget):
     # re-open target for appending
     fileTarget.close()
     fileTarget = open(_filepathTarget, 'a')
-
     csvTarget = csv.writer(fileTarget) # now we will write new lines to file
 
     # loop through all lines in source csv
         # if line's date is after last date in target, append line
     for line in csvSource:
+        #print('checking line')
         date = _csv_line_extract_datetime(line)
-
+        #print('comparing', date, 'to', targetLastDate)
         if date > targetLastDate:
+            #print('appending line')
             csvTarget.writerow(line)
 
     fileTarget.close()
