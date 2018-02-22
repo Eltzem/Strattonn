@@ -1,8 +1,7 @@
 APIKEY = 'SM7GE35DSMNWSBPD' # hard code this for now
 
 import urllib.request # download data
-from Paths import get_data_dir_path
-from Paths import get_path_slash
+from Paths import *
 from timestep import timestep # class for a data point
 import os # chdir, remove, getcwd
 import os.path # exists
@@ -11,6 +10,17 @@ from datetime import datetime # compare dates
 import time # sleep to make AlphaVantage happy
 import random # create random values to sleep from
 
+'''
+    Tests whether time series used and time interval are compatible.
+
+    Args:   string _timeSeries = AlphaVantage time series (TIME_SERIES_INTRADAY)
+            string _timeInterval = AlphaVantage time interval (1min, 5min)
+'''
+def _time_series_compatible (_timeSeries, _timeInterval=None):
+
+        if  ((_timeSeries == 'TIME_SERIES_INTRADAY' and _timeInterval != None) or \
+                (_timeSeries != 'TIME_SERIES_INTRADAY' and _timeInterval == None)):
+            return True
 ''' 
     Creates an AlphaVantage API url for the parameters specified.
 
@@ -168,18 +178,25 @@ def _download_error_occurred (_filepath):
 
     if not os.path.exists(_filepath):
         print('\nFailed to download data csv: file does not exist\n')
-        return False
+        return True
 
     # opens csv file
     with open(_filepath) as f:
         csvFile = csv.reader(f)
-        next(csvFile) # get first line
+        firstLine = next(csvFile) # get first line
+        
+        # saw this once, where file just had '{}' on the first line, nothing else
+        if firstLine == '{}':
+            print('\nFailed to download data csv: no content\n')
+            return True
+
         errorLine = next(csvFile)[0]
         # 'Error' in second line, first column of csv, API error occured
         if 'Error' in errorLine:
             print('\nFailed to download data csv:', errorLine, '\n')
             return True
 
+        # no error occurred as far as this function can tell
         return False
 
 '''
@@ -279,26 +296,17 @@ def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY)
         oldPath = os.getcwd()
 
         # create data directory we need
-        dataDir = get_data_dir_path() + get_path_slash()
+        try:
+            dataDir = get_time_series_data_path(_timeSeries, _timeInterval)
+        except Exception as e:
+            raise e
 
-        # extract subfolder name and add to dataDir
-            # if intraday, use time interval (1min, 5min...)
-            # if interday, use time series (daily, monthly...)
-        if _timeSeries == 'TIME_SERIES_INTRADAY' and _timeInterval != None:
-            dataDir += _timeInterval
-        elif _timeSeries != 'TIME_SERIES_INTRADAY' and _timeInterval == None:
-            dataDir += _timeSeries[12:].lower()
-        else:
-            raise ValueError ('_timeSeries and _timeInterval are not compatible')
-
-        
-        # check if dataDir is there. if not, make it and go in
+        # check if dataDir is there. if not, make it
         if not os.path.exists(dataDir):
             os.mkdir(dataDir)
-        os.chdir(dataDir)
 
         # set filename for new file
-        filenameTemp = _symbol + '_temp.csv'
+        filenameTemp = get_symbol_data_path(_symbol, _timeSeries, _timeInterval) + '.tmp'
 
         # download new data from AlphaVantage API
         try:
@@ -310,7 +318,7 @@ def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY)
         # format csv to our liking
         _format_csv(os.getcwd() + get_path_slash() + filenameTemp)
 
-        filenamePermanent = _symbol + '.csv'
+        filenamePermanent = get_symbol_data_path(_symbol, _timeSeries, _timeInterval)
 
         # append new data to existing if needed
         if os.path.exists(filenamePermanent):
