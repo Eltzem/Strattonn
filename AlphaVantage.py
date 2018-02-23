@@ -303,14 +303,14 @@ def download_symbol_data (_dlDirectory, _filename, _timeout, _symbol, _timeSerie
     If data for the symbol, append the new data to the existing. Assumes the data directory is formatted consistently.
     An existing data directory and comments below should adequetely describe the format.
 
-    Args:   float _timeout = max time to wait between download attempts
-            string _symbol = stock symbol
+    Args:   string _symbol = stock symbol
             string _timeSeries = AlphaVantage time series indicator (ex. TIME_SERIES_INTRADAY)
             string _timeInterval = AlphaVantage time interval indicator. only needed for INTRADAY (ex. 1min)
+            float _timeout = max time to wait between download attempts
             string _apiKey = AlphaVantagae api key
 '''
 #tested
-def update_symbol_data (_timeout, _symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY):
+def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, _timeout=100, apiKey=APIKEY):
         print('update_symbol_data(', _symbol, _timeSeries, _timeInterval, apiKey, ')')
 
         print('Updating symbol data for:', _symbol, 'time series:', _timeSeries, 'timeinterval:', \
