@@ -1,15 +1,30 @@
 import timestep
+
+
 # Converts a cvs file to a list
 class csvreader():
 
-    def __init__(self,_filename):
+    def __init__(self, _filename):
+        source = open(_filename, "r")
         self.aList = []
+        global aList;
         i = 0
-        for line in _filename:
+        for line in source:
             aline = line.split(",")
             self.aList.append(timestep.timestep(aline))
             i += 1
+        self.aList.append("\n")
 
-    def __str__(self):
+        temp = 'trendlines_' + _filename + '.txt'
+        target = open('temp', 'w')
+
+    def str_print(self):
         for item in self.aList:
-                return str(item)
+            print(str(self.aList[item]))
+
+    def data_calculator(self, target, filename):
+        for line in target:
+            self.aList[i]
+
+# linear trendline 5 timesteps
+# ln trendline
