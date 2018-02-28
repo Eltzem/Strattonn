@@ -6,9 +6,51 @@ import numpy as np
 
 class DNN:
 
-    def __init__ (self):
+    # creates a blank model
+    def __init__ (self, _chromosome=None):
         self.model = Sequential() # blank model
         self.layers = []
+
+        # these values are useless unless set from a Chromosome
+            # I initialize them here to avoid errors
+        self.optimizer = 'adam'
+        self.learningRate = 0.001
+        self.windowSize = 1
+        self.inputsPerWindow = 1
+
+        # create from a chromosome if one was specified
+        if _chromosome != None:
+            self.init_from_chromosome(_chromosome)
+
+    # creates a model based off a Chromosome
+    def init_from_chromosome (self, _chromosome):
+        inputSize = _chromosome.input_size()
+        optimizer = _chromosome.optimizer()
+        learningRate = _chromosome.learning_rate()
+        outputSize = _chromosome.output_size()
+        outputActivation = _chromosome.output_activation()
+
+        windowSize = _chromosome.window_size()
+        inputsPerWindow = _chromosome.inputs_per_window()
+
+
+        hl_sizes, hl_activations, hl_dropouts = _chromosome.hidden_layers()
+
+        # add inputs
+        self.add_dense(hl_sizes[0], hl_activations[0], _inputs = inputSize, _dropoutRate = hl_dropouts[0])
+
+        # add other hidden layers
+        for x in range(1, len(hl_sizes)):
+            self.add_dense(hl_sizes[x], hl_activations[x], _dropoutRate = hl_dropouts[x])
+
+        # add output
+        self.add_dense(outputSize, outputActivation)
+
+        # save this information for use later
+        self.optimizer = optimizer
+        self.learningRate = learningRate
+        self.windowSize = windowSize
+        self.inputsPerWindow = inputsPerWindow
 
     def close (self):
         self.model = None
@@ -25,7 +67,7 @@ class DNN:
 
         # add Dropout to layer, if any
         if _dropoutRate > 0:
-            self.addDropout(_dropoutRate)
+            self.add_dropout(_dropoutRate)
 
     def add_dropout (self, _dropoutRate):
         print("adding dropout")
@@ -63,7 +105,11 @@ class DNN:
         # make sure inputs are numpy.array (s)
         _inputs = np.array(_inputs)
 
-        return self.model.predict(x=_inputs)
+        # returns prediction as a single array
+            # NOTE: this may not work if we change the number of outputs. This is a 'cheat,' and the system may not behave
+            # like I think it does
+
+        return self.model.predict(x=_inputs)[0]
 
     def get_layers(self):
         return self.layers
