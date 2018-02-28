@@ -57,16 +57,19 @@ dnn = DNN(c)
 print('compiling model')
 dnn.compile(dnn.optimizer, 'mean_squared_error', ['accuracy'])
 
-print(str(c))
+# print chromosome and layers in DNN object
+print(str(c), '\n')
 
 for layer in dnn.get_layers():
     print(layer.get_config())
 
+# test optimizer
 if dnn.optimizer == c.optimizer():
     print('optimizer test passed')
 else:
     print('optimizer test failed')
 
+# test input size
 if (None, c.input_size()) == dnn.get_layers()[0].get_config()['batch_input_shape']:
     print('input size test passed')
 else:
@@ -84,12 +87,13 @@ for x in range(len(sizes)):
     else:
         print('activations test passed')
 
+# test output shape
 if c.output_size() == dnn.get_layers()[len(dnn.get_layers())-1].get_config()['units']:
     print('output size test passed')
 else:
     print('output size test failed')
 
-
+# test output activation
 if c.output_activation() == dnn.get_layers()[len(dnn.get_layers())-1].get_config()['activation']:
     print('output activation test passed')
 else:

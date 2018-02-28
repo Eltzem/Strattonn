@@ -9,20 +9,25 @@ class Chromosome:
     '''
         Default constructor. Creates a random chromosome within certain bounds.
 
-        Args:   list of integers _hlSizes: contains a list of integers representing hidden layer sizes
+        Args:   list _genome: contains a new genome for the Chromosome to use
+                list of integers _hlSizes: contains a list of integers representing hidden layer sizes
+                list of strings _hlActivations: contains a list of strings representing activation
+                                                functions
+                list of floats _hlDropouts: contains a list of floats representing hidden layer 
+                                                dropout rates
                 integer _maxHL: maximum number of hidden layers (determines size of chromosome)
     '''
 
-    def __init__ (self, _hlSizes=None, _maxHL = 7):
+    def __init__ (self, _list=None, _hlSizes=None, _hlActivations=None, _hlDropouts=None, _maxHL = 7):
         self.genome = []
         
         # Parameters for genome values
 
-        self.MAX_HIDDEN_LAYERS = _maxHL
+        self.maxHiddenLayers = _maxHL
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
 
-        self.minWindowSize = 1
-        self.maxWindowSize = 20 # arbitrary max
+        self.minWindowCount = 1
+        self.maxWindowCount = 20 # arbitrary max
 
         self.inputsPerWindow = 5 # hour, minute, ln() - ln(), trendline, volume
 
@@ -32,43 +37,82 @@ class Chromosome:
         self.minDropout = 0
         self.maxDropout = 1
 
-        optimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
+        self.possibleOptimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
         
         self.minLearningRate = 0.00001 # arbitrary min
         self.maxLearningRate = 1 # arbitrary max
         
-        activations = ['softmax', 'elu', 'selu', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', \
+        self.possibleActivations = ['softmax', 'elu', 'selu', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', \
                         'hard_sigmoid', 'linear']
 
         self.outputSize = 1
 
         # Initialize random genome
 
-        self.genome.append(random.randint(self.minWindowSize, self.maxWindowSize))
+        self.genome.append(random.randint(self.minWindowCount, self.maxWindowCount))
         self.genome.append(self.inputsPerWindow)
-        self.genome.append(random.choice(optimizers))
+        self.genome.append(random.choice(self.possibleOptimizers))
         self.genome.append(random.random() * self.maxLearningRate + self.minLearningRate)
 
-        for x in range(self.MAX_HIDDEN_LAYERS):
+        for x in range(self.maxHiddenLayers):
             # add hidden layer size from _hlSizes or random value
             if _hlSizes != None and x < len(_hlSizes):
                 self.genome.append(_hlSizes[x])
             else:
                 self.genome.append(random.randint(self.minPerceptrons, self.maxPerceptrons))
-                
-            self.genome.append(random.choice(activations))
-            self.genome.append(random.random() * self.maxDropout + self.minDropout)
+            
+            # add hidden layer activation from _hlActivations or random valuei
+            if _hlActivations != None and x < len(_hlActivations):
+                self.genome.append(_hlActivations[x])
+            else:
+                self.genome.append(random.choice(self.possibleActivations))
+            
+            # add hidden layer dropout from _hlDropouts or random value
+            if _hlDropouts != None and x < len(_hlDropouts):
+                self.genome.append(_hlDropouts[x])
+            else:
+                self.genome.append(random.random() * self.maxDropout + self.minDropout)
 
         # output size
         self.genome.append(self.outputSize)
         # output activation function
-        self.genome.append(random.choice(activations))
+        self.genome.append(random.choice(self.possibleActivations))
+
+        # if a genome was passed in, use it instead
+        if _genome != None:
+            self.genome = _genome
 
     '''
         Returns string representation of the chromosome.
     '''
     def __str__ (self):
         return str(self.genome)
+
+    # getters for actual data held in genome
+
+    '''
+        Cleans up the hidden layers in a genome. It 'slides' hidden layers to the left, so any layer
+        with size 0 that don't exist are kept on the right side of the genome.
+    '''
+
+    def _format_genome (self):
+        newGenome = []
+
+        # add data before hidden layers
+        for x in range(self.HIDDEN_LAYER_START):
+            newGenome.append(newGenome[x])
+
+        # add hidden layers
+        sizes, activations, dropouts = self.hidden_layers()
+
+        for x in range(len(sizes)):
+            newGenome.append(sizes[x])
+            newGenome.append(activations[x])
+            newGenome.append(dropouts[x])
+
+        # add 'null' data to end of hidden layer genome space
+        for x in range(len(sizes), self.maxHiddenLayers):
+
 
     '''
         Returns number of inputs in DNN.
@@ -147,3 +191,45 @@ class Chromosome:
             dropouts = [0]
 
         return sizes, activations, dropouts
+
+
+    # simple getters for parameters for genome values
+
+    def possible_optimizers (self):
+        return self.possibleOptimizers
+
+    def possible_activations (self):
+        return self.possibleActivations
+
+    def max_hidden_layers (self):
+        return self.maxHiddenLayers
+
+    def min_window_count (self):
+        return self.min_window_count()
+
+    def max_window_count (self):
+        return self.max_window_count()
+
+    def inputs_per_window (self):
+        return self.inputsPerWindow
+
+    def min_perceptrons (self):
+        return self.minPerceptrons
+
+    def max_perceptrons (self):
+        return self.maxPerceptrons
+
+    def min_dropout (self):
+        return self.min_dropout
+
+    def max_dropout (self):
+        return self.max_dropout
+
+    def min_learning_rate (self):
+        return self.minLearningRate
+
+    def max_learning_rate (self):
+        return self.maxLearningRate
+
+    def output_size (self):
+        return self.outputSize
