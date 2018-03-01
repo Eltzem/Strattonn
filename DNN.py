@@ -2,12 +2,35 @@ from keras.models import Sequential
 from keras.layers import *
 from keras import backend as KerasBackend
 
+from DNN_dao import DNN_dao
+
 import numpy as np
 
 class DNN:
 
     # creates a blank model
-    def __init__ (self, _chromosome=None):
+    def __init__ (self, _chromosome=None, _saveDirectory=None):
+
+        self.init_blank_model()
+
+        # create from a chromosome if one was specified
+        if _chromosome != None:
+            self.init_from_chromosome(_chromosome)
+
+        # create from a saved chromosome and model weights
+        if _savefile=None:
+            dao = DNN_dao()
+            try:
+                dao.load(_saveDirectory)
+                self.init_from_chromosome(dao.chromosome())
+                self.model = dao.model()
+            # failed to load model somehow. init a blank model
+            except Exception as e:
+                print('FAILED to load saved DNN! Creating a blank one.')
+                self.init_blank_model()
+
+    # creates a blank model
+    def init_blank_model (self):
         self.model = Sequential() # blank model
         self.layers = []
 
@@ -17,10 +40,6 @@ class DNN:
         self.learningRate = 0.001
         self.windowSize = 1
         self.inputsPerWindow = 1
-
-        # create from a chromosome if one was specified
-        if _chromosome != None:
-            self.init_from_chromosome(_chromosome)
 
     # creates a model based off a Chromosome
     def init_from_chromosome (self, _chromosome):

@@ -16,12 +16,16 @@ class Chromosome:
                 list of floats _hlDropouts: contains a list of floats representing hidden layer 
                                                 dropout rates
                 integer _maxHL: maximum number of hidden layers (determines size of chromosome)
+                string _filepath: path of file to load a Chromosome from
     '''
 
-    def __init__ (self, _list=None, _hlSizes=None, _hlActivations=None, _hlDropouts=None, _maxHL = 7):
+    def __init__ (self, _genome=None, _hlSizes=None, _hlActivations=None, _hlDropouts=None, \
+                    _maxHL = 7, _filepath=None):
         self.genome = []
-        
-        # Parameters for genome values
+       
+        self.init_random()
+
+        # Set Parameters for genome values
 
         self.maxHiddenLayers = _maxHL
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
@@ -47,40 +51,73 @@ class Chromosome:
 
         self.outputSize = 1
 
+
+
+        # if a genome was passed in, use it instead
+        if _genome != None:
+            self.genome = _genome
+
+        # if a filepath was passed in, load the save Chromosome there
+        if _filepath != None
+            dao = Chromosome_dao()
+            
+            try:
+                dao.load()
+                self.genome = dao.genome()
+            
+            # load failed, initialize random genome
+            except Exception as e:
+                print ('FAILED to load saved Chromosome from file:', _filepath, '. Initializing random \                        Chromosome')
+                self.init_random()
+
+        # format the genome!
+        self._format_genome()
+
+    '''
+        Initializes a random Chromosome.
+    '''
+    def init_random (self):
         # Initialize random genome
 
-        self.genome.append(random.randint(self.minWindowCount, self.maxWindowCount))
-        self.genome.append(self.inputsPerWindow)
-        self.genome.append(random.choice(self.possibleOptimizers))
-        self.genome.append(random.random() * self.maxLearningRate + self.minLearningRate)
+        self.genome.append(self.random_window_count())
+        self.genome.append(self.inputs_per_window())
+        self.genome.append(self.random_optimizer())
+        self.genome.append(self.random_learning_rate())
 
         for x in range(self.maxHiddenLayers):
             # add hidden layer size from _hlSizes or random value
             if _hlSizes != None and x < len(_hlSizes):
                 self.genome.append(_hlSizes[x])
             else:
-                self.genome.append(random.randint(self.minPerceptrons, self.maxPerceptrons))
-            
+                self.genome.append(self.random_perceptron_count())
+
             # add hidden layer activation from _hlActivations or random valuei
             if _hlActivations != None and x < len(_hlActivations):
                 self.genome.append(_hlActivations[x])
             else:
-                self.genome.append(random.choice(self.possibleActivations))
+                self.genome.append(self.random_activation())
             
             # add hidden layer dropout from _hlDropouts or random value
             if _hlDropouts != None and x < len(_hlDropouts):
                 self.genome.append(_hlDropouts[x])
             else:
-                self.genome.append(random.random() * self.maxDropout + self.minDropout)
+                self.genome.append(self.random_dropout())
+
+        self.HIDDEN_LAYER_END = len(self.genome) - 1 # save end of Hidden Layer sections. Right here the HL were the last thing added
 
         # output size
-        self.genome.append(self.outputSize)
+        self.genome.append(self.output_size())
         # output activation function
-        self.genome.append(random.choice(self.possibleActivations))
+        self.genome.append(self.random_activation())
 
-        # if a genome was passed in, use it instead
-        if _genome != None:
-            self.genome = _genome
+
+    def save (self, _filepath):
+        try:
+            dao = Chromosome_dao()
+            dao.save(_filepath, self)
+
+        except Exception as e:
+            print(str(e))
 
     '''
         Returns string representation of the chromosome.
@@ -91,8 +128,9 @@ class Chromosome:
     # getters for actual data held in genome
 
     '''
-        Cleans up the hidden layers in a genome. It 'slides' hidden layers to the left, so any layer
-        with size 0 that don't exist are kept on the right side of the genome.
+        Cleans up the hidden layers in a genome. It 'slides' hidden layers to the left, so any layers
+        with size 0 that don't exist are kept on the right side of the genome. It appends 'null' hidden
+        layer information to the end of the genome hidden layer section.
     '''
 
     def _format_genome (self):
@@ -100,7 +138,7 @@ class Chromosome:
 
         # add data before hidden layers
         for x in range(self.HIDDEN_LAYER_START):
-            newGenome.append(newGenome[x])
+            newGenome.append(self.genome[x])
 
         # add hidden layers
         sizes, activations, dropouts = self.hidden_layers()
@@ -112,6 +150,86 @@ class Chromosome:
 
         # add 'null' data to end of hidden layer genome space
         for x in range(len(sizes), self.maxHiddenLayers):
+            newGenome.append(0)
+            newGenome.append('none')
+            newGenome.append(0)
+
+        # add output data to new genome
+        for x in range(self.HIDDEN_LAYER_END + 1, len(self.genome)):
+            newGenome.append(self.genome[x])
+
+        self.genome = newGenome
+
+    '''
+        Randomly changes one of the Chromosome values.
+
+        NOTE: Assumes that this will never hit the recursion depth limit. I tested it 100 million times
+        and it never did, so it's a pretty good assumption. Some elements of the Chromosome aren't
+        allowed to be modified, so it will recursively call self.mutate() if one of those are selected
+        for modification.
+    '''
+    def mutate (self):
+        index = random.randint(0, len(self.genome) - 1)
+
+        #print('mutation index:', index)
+
+        newValue = None
+        if index == 0:
+            newValue = self.random_window_count()
+        elif index == 1: # don't change the inputs_per_window value yet, or ever maybe, try to mutate again
+            newValue = self.genome[1]
+            self.mutate()
+        elif index == 2:
+            newValue = self.random_optimizer()
+        elif index == 3:
+            newValue = self.random_learning_rate()
+
+        # hidden layer parameter
+        elif index >= self.HIDDEN_LAYER_START and index <= self.HIDDEN_LAYER_END:
+            # activation function
+            if isinstance(self.genome[index], str):
+                newValue = self.random_activation()
+
+            # hidden layer size
+                # relies on assumption that the next item in Chromosome after a hidden layer size is a string (activation function)
+            elif isinstance(self.genome[index + 1], str):
+                newValue = self.random_perceptron_count()
+
+            # dropout
+            else:
+                newValue = self.random_dropout()
+
+        elif index == self.HIDDEN_LAYER_END + 1: # don't change the output size, try to mutate again
+            newValue = self.output_size()
+            self.mutate()
+        else:
+            newValue = self.random_activation()
+
+        #print('newValue:', newValue)
+
+        # apply change
+        self.genome[index] = newValue
+
+    # these functions generate random values based on pre-defined value constraints
+
+    def random_window_count (self):
+        return random.randint(self.min_window_count(), self.max_window_count())
+
+    def random_optimizer (self):
+        return random.choice(self.possible_optimizers())
+
+    def random_learning_rate (self):
+        return random.random () * self.max_learning_rate() + self.min_learning_rate()
+
+    def random_perceptron_count (self):
+        return random.randint(self.min_perceptrons(), self.max_perceptrons())
+
+    def random_activation (self):
+        return random.choice(self.possible_activations())
+
+    def random_dropout (self):
+        return random.random() * self.max_dropout() + self.min_dropout()
+
 
 
     '''
@@ -205,10 +323,10 @@ class Chromosome:
         return self.maxHiddenLayers
 
     def min_window_count (self):
-        return self.min_window_count()
+        return self.minWindowCount
 
     def max_window_count (self):
-        return self.max_window_count()
+        return self.maxWindowCount
 
     def inputs_per_window (self):
         return self.inputsPerWindow
@@ -220,10 +338,10 @@ class Chromosome:
         return self.maxPerceptrons
 
     def min_dropout (self):
-        return self.min_dropout
+        return self.minDropout
 
     def max_dropout (self):
-        return self.max_dropout
+        return self.maxDropout
 
     def min_learning_rate (self):
         return self.minLearningRate
