@@ -3,6 +3,7 @@ from array import array
 import timestep
 import csv
 import numpy as np
+import math
 from scipy import stats
 # Converts a cvs file to a list
 class csvreader():
@@ -28,17 +29,24 @@ class csvreader():
                     else:
                         pastFive.append((row[7]))
 
+                    outrow = []
+
+                    pastFive = list(map(float, pastFive))
+                    if len(pastFive)>1:
+                        percentIncrease = (pastFive[0] - pastFive[1]) / math.fabs(pastFive[0])*100
+                        outrow.append(percentIncrease)
+
+
                     # From list of stings to np array of ints
-                    linearInput = np.array(list(map(float, pastFive)))
+                    linearInput = np.array(pastFive)
 
                     # generating "time" for regression
                     x = np.array(range(1,pastFive.__len__()+1))
-
                     slope, intercept, r_value, p_value, std_err = stats.linregress(x, linearInput)
+                    outrow.append(slope)
 
-                    row.append(slope)
-
-                    csvNew.writerow(row)
+                    # add header with date
+                    csvNew.writerow(outrow)
 
         fOld.close()
         fNew.close()

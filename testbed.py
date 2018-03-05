@@ -1,7 +1,6 @@
 import csvreader
-filename = open("ANG.csv","r")
+filename = "ANG.csv"
 test = csvreader.csvreader(filename)
-print(test)
-print('[%s]' % "".join(map(str, test.aList)))
+#print('[%s]' % "".join(map(str, test.aList)))
 
 
