@@ -17,12 +17,15 @@ class DNN_dao:
     def __init__ (self):
         self.CHROMOSOME_FILENAME = 'chromosome'
         self.MODEL_FILENAME = 'model.hdf5'
-        self.LAYERS_FILENAME = 'layers'
 
         self.model = None
         self.chromosome = None
-        self.layers = None
 
+    '''
+        Loads a saved DNN object and its Chromosome. Sets self.model and self.chromosome.
+
+        Args: _directoryPath = string, folder path to load from
+    '''
     def load (self, _directoryPath):
         print('loading model from', _directoryPath)
 
@@ -50,7 +53,13 @@ class DNN_dao:
 
         # restore current working directory
         os.chdir(oldPath)
-   
+
+    '''
+        Saves a DNN object and its Chromosome if present.
+
+        Args:   _directoryPath = folder path to save DNN to
+                _dnn = DNN object to save
+    '''
     def save (self, _directoryPath, _dnn):
         print('saving DNN to', _directoryPath, '/', self.MODEL_FILENAME)
 

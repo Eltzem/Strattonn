@@ -30,8 +30,9 @@ class DNN:
 
 
       
-
-    # creates a blank model
+    '''
+        Creates a blank model with no layers.
+    '''
     def init_blank_model (self):
         self.model = Sequential() # blank model
         #self.layers = []
@@ -43,6 +44,11 @@ class DNN:
         self.windowSize = 1
         self.inputsPerWindow = 1
 
+    '''
+        Translates a Chromosome object into a neural network.
+    
+        Args:   _chromosome = Chromosome object to translate
+    '''
     # creates a model based off a Chromosome
     def init_from_chromosome (self, _chromosome):
         self.model = Sequential() # blank model
@@ -76,6 +82,11 @@ class DNN:
         self.windowSize = windowSize
         self.inputsPerWindow = inputsPerWindow
 
+    '''
+        Saves the DNN using the DAO object.
+
+        Args:   _saveDirectory = directory to save the DNN items (DNN + Chromosome)
+    '''
     def save (self, _saveDirectory):
         dao = DNN_dao()
 
@@ -84,6 +95,11 @@ class DNN:
         except Exception as e:
             raise e
 
+    '''
+        Loads a saved DNN and Chromosome (if it exists).
+
+        Args:   _saveDirectory = directory to load DNN items from (DNN + Chromosome)
+    '''
     def load(self, _saveDirectory):
         dao = DNN_dao()
 
@@ -110,11 +126,22 @@ class DNN:
         self.model = model
         self.chromosome = chromosome
     
+    '''
+        'Closes' a model. This prevents sometimes random errors when utilizing a model.
+    '''
     def close (self):
         self.model = None
         self.layers = None
         KerasBackend.clear_session()
 
+    '''
+        Adds a fully connected perceptron layer.
+
+        Args:   _perceptrons = perceptrons to put in layer
+                _activation = string, activation function for layer
+                _inputs = number of inputs for layer (only use if this is the first layer)
+                _dropoutRate = [0, 1), percentage of connections to 'dropout'
+    '''
     def add_dense (self, _perceptrons, _activation, _inputs=None, _dropoutRate=0):
         print("adding dense perceptron layer")
 
@@ -127,6 +154,12 @@ class DNN:
         if _dropoutRate > 0:
             self.add_dropout(_dropoutRate)
 
+    '''
+        Leaves out some connections to and from this layer. Dropout helps prevent against
+        over fitting.
+
+        Args:   _dropoutRate = [0,1), percentage of connections to leave out
+    '''
     def add_dropout (self, _dropoutRate):
         print("adding dropout")
 
@@ -135,13 +168,27 @@ class DNN:
         self.model.add(newLayer)
         #self.model.layers.append(newLayer)
 
-    # configure the learning process before training
+    '''
+        Configures the learning process before the model is trained.
+
+        Args:   _optimizer = string, optimizer to use for training
+                _loss = string, loss metric to use
+                _metrics = array of strings, addition loss metrics to display while training
+    '''
     def compile (self, _optimizer, _loss, _metrics):
         print("compiling model")
 
         self.model.compile(optimizer=_optimizer, loss=_loss, metrics=_metrics)
 
-    # fit model, I called it train
+    '''
+        Trains the model with test data.
+
+        Args:   _inputs = [ [0input0, 0input1, 0input2...], [1input0, 1input1, 1input2...]... ]
+                _outputs = [ [0output0, 0output1, 0outptu2...], [1output0, 1output1, 1output2...]... ]
+                _epochs = number of times to run through data while training
+                _batchSize = number of input/output combinations to run though model before changing
+                                weights
+    '''
     def train (self, _inputs, _outputs, _epochs, _batchSize):
         print("training model")
 
@@ -151,7 +198,14 @@ class DNN:
 
         self.model.fit(x=_inputs, y=_outputs, epochs=_epochs, batch_size=_batchSize, verbose=2)
 
-    # test the model
+    '''
+        Test the model on non-training data.
+
+        Args:   _inputs = inputs, same as defined in train()
+                _outputs = outputs, same as defined in train()
+
+        Returns:    array containing loss metric and additional loss metrics for training data
+    '''
     def evaluate (self, _inputs, _outputs):
         # make sure inputs and outputs are numpy.array (s)
         _inputs = np.array(_inputs)
@@ -159,6 +213,13 @@ class DNN:
 
         return self.model.evaluate(x=_inputs, y=_outputs)
 
+    '''
+        Predicts outputs for an input series.
+
+        Args:   _inputs = [input0, input1, input2...]
+
+        Returns:    array containing a predicted value for each output
+    '''
     def predict (self, _inputs):
         # make sure inputs are numpy.array (s)
         _inputs = np.array(_inputs)
