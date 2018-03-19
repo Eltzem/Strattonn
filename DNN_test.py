@@ -15,7 +15,7 @@ model.add_dense(32, 'relu', _inputs=5)
 model.add_dense(100, 'softmax', _dropoutRate=0.1)
 model.add_dense(1, 'elu')
 
-model.compile('adam', 'mean_squared_error', ['accuracy'])
+model.compile('adam', 'mean_squared_error')
 
 
 

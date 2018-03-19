@@ -31,12 +31,12 @@ class Chromosome:
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
 
         self.minWindowCount = 1
-        self.maxWindowCount = 20 # arbitrary max
+        self.maxWindowCount = 1 # arbitrary max
 
         self.inputsPerWindow = 5 # hour, minute, ln() - ln(), trendline, volume
 
         self.minPerceptrons = 1
-        self.maxPerceptrons = 10000 # arbitrary max
+        self.maxPerceptrons = 1000 # arbitrary max
 
         self.minDropout = 0
         self.maxDropout = 1
@@ -309,7 +309,7 @@ class Chromosome:
         # loop through layer information
         x = self.HIDDEN_LAYER_START
         while x <= len(self.genome) - 3:
-            print(self.genome[x])
+            #print(self.genome[x])
             # check if layer meets perceptron threshold to be considered
             if self.genome[x] >= self.minPerceptrons:
                 # add info to layers

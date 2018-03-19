@@ -131,7 +131,6 @@ class DNN:
     '''
     def close (self):
         self.model = None
-        self.layers = None
         KerasBackend.clear_session()
 
     '''
@@ -143,7 +142,7 @@ class DNN:
                 _dropoutRate = [0, 1), percentage of connections to 'dropout'
     '''
     def add_dense (self, _perceptrons, _activation, _inputs=None, _dropoutRate=0):
-        print("adding dense perceptron layer")
+        #print("adding dense perceptron layer")
 
         newLayer = Dense(_perceptrons, activation=_activation, input_shape=(_inputs,))
 
@@ -161,7 +160,7 @@ class DNN:
         Args:   _dropoutRate = [0,1), percentage of connections to leave out
     '''
     def add_dropout (self, _dropoutRate):
-        print("adding dropout")
+        #print("adding dropout")
 
         # dropout of a layer functions as a layer in Keras
         newLayer = Dropout(_dropoutRate)
@@ -175,7 +174,7 @@ class DNN:
                 _loss = string, loss metric to use
                 _metrics = array of strings, addition loss metrics to display while training
     '''
-    def compile (self, _optimizer, _loss, _metrics):
+    def compile (self, _optimizer, _loss, _metrics=None):
         print("compiling model")
 
         self.model.compile(optimizer=_optimizer, loss=_loss, metrics=_metrics)
