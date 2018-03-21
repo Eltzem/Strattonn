@@ -158,6 +158,16 @@ class Chromosome:
         return self.genome
 
     '''
+        Returns the genome list as a copy.
+    '''
+    def get_genome_copy (self):
+        genomeCopy = []
+        for element in self.genome:
+            genomeCopy.append(element)
+
+        return genomeCopy
+
+    '''
         Returns string representation of the chromosome.
     '''
     def __str__ (self):
