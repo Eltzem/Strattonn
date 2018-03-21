@@ -81,7 +81,7 @@ class GeneticSearchDNN:
                 print('mode:', models[x][1])
 
             # sort models based on loss
-            print('sorting models by loss')
+            print('\nsorting models by loss\n')
             models = sorted(models, key=get_sorted_key)
             
             # save models
