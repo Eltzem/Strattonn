@@ -1,6 +1,3 @@
-from array import array
-
-import timestep
 import csv
 import numpy as np
 import math
@@ -9,10 +6,10 @@ from scipy import stats
 class csvreader():
 
     def __init__(self,_filename):
-        filepathNew = _filename + "_data.csv"
+        filepathNew = _filename[:-4] + "_data.csv"
         with open(_filename) as fOld:
             csvOld = csv.reader(fOld)
-            with open(filepathNew, 'w') as fNew:
+            with open(filepathNew, 'w', newline='') as fNew:
                 csvNew = csv.writer(fNew)
 
                 next(csvOld)
@@ -41,9 +38,11 @@ class csvreader():
                     linearInput = np.array(pastFive)
 
                     # generating "time" for regression
+                    #np.set_printoptions(precision=5)
                     x = np.array(range(1,pastFive.__len__()+1))
                     slope, intercept, r_value, p_value, std_err = stats.linregress(x, linearInput)
                     outrow.append(slope)
+                    print(slope)
 
                     # add header with date
                     csvNew.writerow(outrow)
