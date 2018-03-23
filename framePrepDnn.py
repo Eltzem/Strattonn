@@ -4,10 +4,8 @@ import csv
 class framePrepDnn:
 
     def __init__(self,_filesymbol):
-        getData(_filesymbol)
-
-    def getData(_filesymbol):
         # Start Stop @ framelength
+        self.frames = []
 
         filename = _filesymbol + "_data.csv"
         print("starting read of file: " + filename)
@@ -15,7 +13,6 @@ class framePrepDnn:
         with open(filename) as in_file:
             filelength = sum(1 for _ in in_file)
 
-            frames = []
 
             with open(filename) as csvr:
                 frame = []
@@ -25,5 +22,4 @@ class framePrepDnn:
                         frame.pop(0)
                     frame.append(row)
 
-                    frames.append(frame)
-        return(frames)
+                    self.frames.append(frame)
