@@ -12,7 +12,7 @@ import os.path
 class GeneticSearchDNN:
 
 
-    def __init__ (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs, _symbol, _testPercentage=0.1):
+    def __init__ (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs, _testPercentage=0.1):
 
         # check whether search settings make sense
         if not self.verify_search_settings (_popSize, _selection, _mutation, _newblood, _crossoverPairs):
@@ -24,8 +24,6 @@ class GeneticSearchDNN:
         self.newblood = _newblood
         self.crossoverPairs = _crossoverPairs
 
-        self.symbol = _symbol # symbol to train data on
-
         self.testPercentage = _testPercentage # percentage of data to use for testing
 
 
@@ -33,11 +31,13 @@ class GeneticSearchDNN:
     def searchVerbose (self, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None):
 
         # get training/testing data
-        trainInputs, trainOutputs, testInputs, testOutputs = self.load_training_and_testing_data(self.symbol)
+        trainInputs, trainOutputs, testInputs, testOutputs = self.load_training_and_testing_data()
 
         # initialize starting random Chromosomes
         chromosomes = []
         for x in range(self.popSize):
+            newChromosome = Chromosome()
+            #print('inputs:', newChromosome.input_size())
             chromosomes.append(Chromosome())
 
         # if you want to start with a list of Chromosomes, pass them in with _initialPopuation
@@ -55,10 +55,14 @@ class GeneticSearchDNN:
             # create, train, and evaluate DNNs
             for x in range(len(chromosomes)):
                 newDNN = DNN(_chromosome=chromosomes[x])
-                newDNN.compile(newDNN.optimizer, 'mean_squared_error')
+
+                print('dnn:', newDNN.get_model().summary())
+
+                # NOTE: modified for MNIST
+                newDNN.compile(newDNN.optimizer, 'categorical_hinge', _metrics=['categorical_accuracy'])
                 newDNN.train(trainInputs, trainOutputs, _epochs, _batchSize)
                 
-                losses.append(newDNN.evaluate(testInputs, testOutputs))
+                losses.append(newDNN.evaluate(testInputs, testOutputs)[1])
                 print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
                 dnns.append(newDNN)
 
@@ -84,6 +88,13 @@ class GeneticSearchDNN:
             print('\nsorting models by loss\n')
             models = sorted(models, key=get_sorted_key)
             
+            # NOTE: added for MNIST
+            # reverse sorted order
+            newModels = []
+            for x in range(len(models)-1, -1, -1):
+                newModels.append(models[x])
+            models = newModels
+
             # save models
             print('\nsaving', _numberToSave, 'best models\n')
             self.save_best_models(models, _numberToSave, 'search-dnn-saves' + get_path_slash() + str(generationCount))
@@ -171,21 +182,29 @@ class GeneticSearchDNN:
         return Chromosome(_genome=newGenome)
 
     def tournament_selection (self, _max):
+
+        options = []
+
+        for x in range(int(_max * 0.05 + 1)):
+            options.append(random.randint(0, _max-1))
+
+        '''
         a = random.randint(0, _max - 1)
         b = random.randint(0, _max - 1)
 
         if a < b:
             return a
         return b
+        '''
+
+        return sorted(options)[0]
 
     # returns training and testing data for network. Randomizes it.
-    def load_training_and_testing_data (self, _symbol):
-        #TODO: inputs, outputs = loadData(_symbol)
-
-        # just use dummy data for now
-        inputs = [[3, 4, 5, 6, 7], [6, 7, 8, 9, 10], [2, 3, 4, 5, 6], [5, 6, 7, 8, 9], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [2, 3, 4, 5, 6], [6, 7, 8, 9, 10], [4, 5, 6, 7, 8], [6, 7, 8, 9, 10], [0, 1, 2, 3, 4], [6, 7, 8, 9, 10], [5, 6, 7, 8, 9], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [5, 6, 7, 8, 9], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [4, 5, 6, 7, 8], [5, 6, 7, 8, 9], [5, 6, 7, 8, 9], [2, 3, 4, 5, 6], [6, 7, 8, 9, 10], [0, 1, 2, 3, 4], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [3, 4, 5, 6, 7], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7], [3, 4, 5, 6, 7], [2, 3, 4, 5, 6], [0, 1, 2, 3, 4], [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [0, 1, 2, 3, 4], [6, 7, 8, 9, 10], [3, 4, 5, 6, 7], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8], [2, 3, 4, 5, 6], [0, 1, 2, 3, 4], [1, 2, 3, 4, 5], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8], [3, 4, 5, 6, 7], [3, 4, 5, 6, 7], [1, 2, 3, 4, 5], [3, 4, 5, 6, 7], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [5, 6, 7, 8, 9], [6, 7, 8, 9, 10], [4, 5, 6, 7, 8], [3, 4, 5, 6, 7], [6, 7, 8, 9, 10], [4, 5, 6, 7, 8], [2, 3, 4, 5, 6], [5, 6, 7, 8, 9], [2, 3, 4, 5, 6], [6, 7, 8, 9, 10], [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [5, 6, 7, 8, 9], [2, 3, 4, 5, 6], [6, 7, 8, 9, 10], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [2, 3, 4, 5, 6], [0, 1, 2, 3, 4], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [5, 6, 7, 8, 9], [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [0, 1, 2, 3, 4], [4, 5, 6, 7, 8], [3, 4, 5, 6, 7], [6, 7, 8, 9, 10], [2, 3, 4, 5, 6], [2, 3, 4, 5, 6], [4, 5, 6, 7, 8], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [5, 6, 7, 8, 9], [5, 6, 7, 8, 9], [2, 3, 4, 5, 6], [6, 7, 8, 9, 10], [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [0, 1, 2, 3, 4], [4, 5, 6, 7, 8], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [2, 3, 4, 5, 6], [5, 6, 7, 8, 9], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [0, 1, 2, 3, 4], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [5, 6, 7, 8, 9], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [3, 4, 5, 6, 7], [1, 2, 3, 4, 5], [0, 1, 2, 3, 4], [1, 2, 3, 4, 5], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [4, 5, 6, 7, 8], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [5, 6, 7, 8, 9], [4, 5, 6, 7, 8], [2, 3, 4, 5, 6], [0, 1, 2, 3, 4], [3, 4, 5, 6, 7], [6, 7, 8, 9, 10], [6, 7, 8, 9, 10], [2, 3, 4, 5, 6], [6, 7, 8, 9, 10], [3, 4, 5, 6, 7], [6, 7, 8, 9, 10], [5, 6, 7, 8, 9]]
-
-        outputs = [[8], [11], [7], [10], [6], [9], [9], [7], [11], [9], [11], [5], [11], [10], [11], [11], [10], [11], [11], [9], [10], [10], [7], [11], [5], [6], [9], [8], [7], [8], [8], [7], [5], [6], [11], [11], [5], [11], [8], [7], [8], [9], [7], [5], [6], [8], [9], [8], [8], [6], [8], [6], [6], [10], [11], [9], [8], [11], [9], [7], [10], [7], [11], [6], [11], [10], [7], [11], [8], [9], [9], [7], [5], [9], [9], [10], [6], [11], [11], [5], [9], [8], [11], [7], [7], [9], [6], [6], [6], [10], [10], [7], [11], [5], [10], [6], [11], [5], [9], [6], [6], [7], [7], [10], [8], [9], [6], [9], [9], [5], [11], [11], [10], [9], [9], [9], [8], [6], [5], [6], [8], [9], [9], [9], [9], [11], [11], [10], [9], [7], [5], [8], [11], [11], [7], [11], [8], [11], [10]]
+    # NOTE: using MNIST data
+    def load_training_and_testing_data (self):
+        inputs, outputs = self.load_data()
+        inputs = inputs.tolist()
+        outputs = outputs.tolist()
 
         # randomize data
         data = list(zip(inputs, outputs))
@@ -194,6 +213,9 @@ class GeneticSearchDNN:
 
         # index to split training and testing data on
         indexDivider = int(len(inputs) * self.testPercentage)
+        #print('indexDivider:', indexDivider)
+        testInputs = []
+        testOutputs = []
 
         # split data
         testInputs = inputs[:indexDivider]
@@ -202,7 +224,54 @@ class GeneticSearchDNN:
         trainInputs = inputs[indexDivider:]
         trainOutputs = outputs[indexDivider:]
 
+        print('testInputs:', len(testInputs))
+        print('testOutputs:', len(testOutputs))
+        print('trainInputs:', len(trainInputs))
+        print('trainOutputs:', len(trainOutputs))
+
+        #print(testInputs[2])
+        #print(testOutputs[2])
+        #print(trainInputs[2])
+        #print(trainOutputs[2])
+
         return trainInputs, trainOutputs, testInputs, testOutputs
+
+    # NOTE: load MNIST data
+    def load_data (self):
+        # retrieve mnist data
+        from keras.datasets import mnist
+        (input_train, output_train), (input_test, output_test) = mnist.load_data()
+
+        #print(input_train)
+
+        '''
+        inputs = input_train
+        for elemenet in input_test:
+            inputs.append(element)
+        outputs = output_train
+        for element in output_test:
+            outputs.append(output_test)
+        '''
+
+        inputs = input_train.tolist() + input_test.tolist()
+        outputs = output_train.tolist() + output_test.tolist()
+        
+        # flatten itmages (preprocessing)
+        print('flattening images')
+        from mnist import flatten_images
+        inputs = flatten_images(inputs)
+        print(inputs)
+
+        # expand outputs into 10 categories (preprocessing)
+        print('expanding outputs')
+        from mnist import expand_outputs
+        outputs = expand_outputs(outputs)
+        print(outputs)
+
+
+        print('inputs:', len(inputs))
+        print('outputs:', len(outputs))
+        return inputs, outputs
 
     # saves the best models of a generation to disk. Assumes _models is sorted
     def save_best_models (self, _models, _numberToSave, _directoryPath):

@@ -30,10 +30,12 @@ class Chromosome:
         self.maxHiddenLayers = _maxHL
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
 
-        self.minWindowCount = 1
-        self.maxWindowCount = 1 # arbitrary max
+        # NOTE: modified for MNIST
+        self.minWindowCount = 28
+        self.maxWindowCount = 28# arbitrary max
 
-        self.inputsPerWindow = 5 # hour, minute, ln() - ln(), trendline, volume
+        # NOTE: modified for MNIST
+        self.inputsPerWindow = 28 # hour, minute, ln() - ln(), trendline, volume
 
         self.minPerceptrons = 1
         self.maxPerceptrons = 1000 # arbitrary max
@@ -49,7 +51,8 @@ class Chromosome:
         self.possibleActivations = ['softmax', 'elu', 'selu', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', \
                         'hard_sigmoid', 'linear']
 
-        self.outputSize = 1
+        # NOTE: modified for MNIST
+        self.outputSize = 10
 
         # Create random genome to start with at least
         self.init_random(_hlSizes=_hlSizes, _hlActivations=_hlActivations, _hlDropouts=_hlDropouts)
