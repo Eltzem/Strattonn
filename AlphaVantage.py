@@ -16,11 +16,14 @@ import random # create random values to sleep from
     Args:   string _timeSeries = AlphaVantage time series (TIME_SERIES_INTRADAY)
             string _timeInterval = AlphaVantage time interval (1min, 5min)
 '''
+#tested
 def _time_series_compatible (_timeSeries, _timeInterval=None):
 
         if  ((_timeSeries == 'TIME_SERIES_INTRADAY' and _timeInterval != None) or \
                 (_timeSeries != 'TIME_SERIES_INTRADAY' and _timeInterval == None)):
             return True
+
+        return False
 ''' 
     Creates an AlphaVantage API url for the parameters specified.
 
@@ -71,8 +74,10 @@ def _csv_line_extract_datetime (_line):
 
     Args:   string _filepath: relative or full filepath to the csv file to format
 '''
+
+#TODO make it work with other time series
 #tested
-def _format_csv (_filepath):
+def _format_csv (_filepath, _timeSeries):
     print('_format_csv(', _filepath, ')')
     
     # check if path exists
@@ -101,8 +106,14 @@ def _format_csv (_filepath):
             for row in csvOld:
                 
                 # date extraction
-                date = datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+                dateString = row[0]
+                if _timeSeries == 'TIME_SERIES_INTRADAY':
+                    pass # nothing to be changed
+                else:
+                    dateString = dateString + ' 00:00:00'
                 
+                date = datetime.strptime(dateString, "%Y-%m-%d %H:%M:%S")
+
                 # add row data to dictionary for easy access
                 rows.append({'year':date.year, 'month':date.month, 'day':date.day, 'hour':date.hour, \
                                 'minute':date.minute, 'openPrice':row[1], 'closePrice':row[4], \
@@ -204,13 +215,14 @@ def _download_error_occurred (_filepath):
     (API or HTTP), retry a max of 9 more times. Wait until retry starts at 1 second and doubles for each successive failure.
 
     Args:   string _dlDirectory = relative or full path to the data directory to download the file into
+            float _timeout = max seconds to try to download file for
             string _symbol = stock symbol
             string _timeSeries = AlphaVantage time series indicator (ex. TIME_SERIES_INTRADAY)
             string _timeInterval = AlphaVantage time interval indicator. only needed for INTRADAY (ex. 1min)
             string _apiKey = AlphaVantagae api key
 '''
 # tested
-def download_symbol_data (_dlDirectory, _filename, _symbol, _timeSeries, _timeInterval=None, \
+def download_symbol_data (_dlDirectory, _filename, _timeout, _symbol, _timeSeries, _timeInterval=None, \
                             _apiKey=APIKEY):
     print('download_symbol_data(', _dlDirectory, _filename, _symbol, _timeSeries, _timeInterval, \
                             _apiKey, ')')
@@ -239,8 +251,9 @@ def download_symbol_data (_dlDirectory, _filename, _symbol, _timeSeries, _timeIn
     APIFails = 0
     APISuccess = False
     requestWaitTime = 1 # seconds to wait between failed requests
+    totalWaitTime = 0
 
-    while not APISuccess and APIFails < maxAPIFails:
+    while (not APISuccess) and APIFails < maxAPIFails and totalWaitTime < _timeout:
         print('downloading', url)
         
         try:
@@ -265,12 +278,22 @@ def download_symbol_data (_dlDirectory, _filename, _symbol, _timeSeries, _timeIn
             if os.path.exists(_filename + '.tmp'):
                 os.remove(_filename + '.tmp')
 
+            # wait before next download attempt
+            # if this attempt will exceed _timeout time, wait for rest of _timeout time
+            if totalWaitTime + requestWaitTime > _timeout:
+                requestWaitTime = _timeout - totalWaitTime
+            print('waiting for', requestWaitTime, 'seconds')
             time.sleep(requestWaitTime)
+            totalWaitTime += requestWaitTime
             requestWaitTime *= 2 # keep increasing wait time between requests
 
-    # API failure exceeded threshold, abandon it
+    # API failure exceeded threshold retries, abandon it
     if not APISuccess and APIFails >= maxAPIFails:
         raise Exception('API download failure exceeded threshold of', str(maxAPIFails))
+
+    # API failure exceed threshold time, abandon it
+    if not APISuccess and totalWaitTime >= _timeout:
+        raise Exception('API download failure exceeded waittime of', _timeout, 'seconds')
 
     # restore current working directory
     os.chdir(oldPath)
@@ -283,10 +306,11 @@ def download_symbol_data (_dlDirectory, _filename, _symbol, _timeSeries, _timeIn
     Args:   string _symbol = stock symbol
             string _timeSeries = AlphaVantage time series indicator (ex. TIME_SERIES_INTRADAY)
             string _timeInterval = AlphaVantage time interval indicator. only needed for INTRADAY (ex. 1min)
+            float _timeout = max time to wait between download attempts
             string _apiKey = AlphaVantagae api key
 '''
 #tested
-def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY):
+def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, _timeout=100, apiKey=APIKEY):
         print('update_symbol_data(', _symbol, _timeSeries, _timeInterval, apiKey, ')')
 
         print('Updating symbol data for:', _symbol, 'time series:', _timeSeries, 'timeinterval:', \
@@ -294,6 +318,10 @@ def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY)
 
         # save current working directory
         oldPath = os.getcwd()
+
+        # check whether time series and time interval have compatible values
+        if not _time_series_compatible (_timeSeries, _timeInterval):
+            raise ValueError ('AlphaVantage.py: _timeSeries and _timeInterval are not compatible')
 
         # create data directory we need
         try:
@@ -310,13 +338,13 @@ def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, apiKey=APIKEY)
 
         # download new data from AlphaVantage API
         try:
-            download_symbol_data (os.getcwd(), filenameTemp, _symbol, _timeSeries, \
+            download_symbol_data (os.getcwd(), filenameTemp, _timeout, _symbol, _timeSeries, \
                     _timeInterval=_timeInterval, _apiKey=APIKEY)
         except Exception as e:
             raise e
 
         # format csv to our liking
-        _format_csv(os.getcwd() + get_path_slash() + filenameTemp)
+        _format_csv(os.getcwd() + get_path_slash() + filenameTemp, _timeSeries)
 
         filenamePermanent = get_symbol_data_path(_symbol, _timeSeries, _timeInterval)
 
