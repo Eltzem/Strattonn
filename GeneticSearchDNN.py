@@ -58,8 +58,7 @@ class GeneticSearchDNN:
 
                 print('dnn:', newDNN.get_model().summary())
 
-                # NOTE: modified for MNIST
-                newDNN.compile(newDNN.optimizer, 'categorical_hinge', _metrics=['categorical_accuracy'])
+                newDNN.compile(newDNN.optimizer, 'mean_squared_error')
                 newDNN.train(trainInputs, trainOutputs, _epochs, _batchSize)
                 
                 losses.append(newDNN.evaluate(testInputs, testOutputs)[1])
@@ -88,13 +87,6 @@ class GeneticSearchDNN:
             print('\nsorting models by loss\n')
             models = sorted(models, key=get_sorted_key)
             
-            # NOTE: added for MNIST
-            # reverse sorted order
-            newModels = []
-            for x in range(len(models)-1, -1, -1):
-                newModels.append(models[x])
-            models = newModels
-
             # save models
             print('\nsaving', _numberToSave, 'best models\n')
             # make sure save directory exists
@@ -201,6 +193,8 @@ class GeneticSearchDNN:
         '''
 
         return sorted(options)[0]
+
+    # TODO will change this later when data prep stuff is done
 
     # returns training and testing data for network. Randomizes it.
     # NOTE: using MNIST data
