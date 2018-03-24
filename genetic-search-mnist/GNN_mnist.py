@@ -17,4 +17,4 @@ startingPopulation.append(Chromosome(_genome=[28, 28, 'adam', 0, 500, 'softmax',
 for x in range(10):
     startingPopulation.append(Chromosome())
 
-gen.searchVerbose('search-dnn-saves-2', 5, 5, 2, 1000, _initialPopulation=None, _maxHL=4)
+gen.searchVerbose('search-dnn-mnist', 5, 5, 2, 1000, _initialPopulation=None, _maxHL=4)

@@ -61,7 +61,7 @@ class GeneticSearchDNN:
                 newDNN.compile(newDNN.optimizer, 'mean_squared_error')
                 newDNN.train(trainInputs, trainOutputs, _epochs, _batchSize)
                 
-                losses.append(newDNN.evaluate(testInputs, testOutputs)[1])
+                losses.append(newDNN.evaluate(testInputs, testOutputs)[0])
                 print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
                 dnns.append(newDNN)
 
@@ -86,7 +86,7 @@ class GeneticSearchDNN:
             # sort models based on loss
             print('\nsorting models by loss\n')
             models = sorted(models, key=get_sorted_key)
-            
+
             # save models
             print('\nsaving', _numberToSave, 'best models\n')
             # make sure save directory exists
@@ -194,7 +194,7 @@ class GeneticSearchDNN:
 
         return sorted(options)[0]
 
-    # TODO will change this later when data prep stuff is done
+    # TODO: change these 2 functions to work with stock data once the inputs / outputs are ready
 
     # returns training and testing data for network. Randomizes it.
     # NOTE: using MNIST data
