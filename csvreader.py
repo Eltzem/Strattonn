@@ -22,11 +22,13 @@ class csvreader():
                     if(pastFive.__len__()>4):
                         for i in range(4, 0, -1):
                             pastFive[i] = pastFive[i-1]
-                        pastFive[0]=(row[7])
+                        pastFive[0]=(row[6]) #7?
                     else:
-                        pastFive.append((row[7]))
+                        pastFive.append((row[6])) #7?
 
+                    # adding volume
                     outrow = []
+                    outrow.append(row[9])
 
                     pastFive = list(map(float, pastFive))
                     if len(pastFive)>1:
@@ -42,7 +44,10 @@ class csvreader():
                     x = np.array(range(1,pastFive.__len__()+1))
                     slope, intercept, r_value, p_value, std_err = stats.linregress(x, linearInput)
                     outrow.append(slope)
-                    print(slope)
+
+                    # adding hour/minute
+                    outrow.append(row[3])
+                    outrow.append(row[4])
 
                     # add header with date
                     csvNew.writerow(outrow)
