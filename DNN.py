@@ -53,7 +53,9 @@ class DNN:
     def init_from_chromosome (self, _chromosome):
         self.model = Sequential() # blank model
         #self.layers = []
-        
+
+        print(_chromosome)
+
         inputSize = _chromosome.input_size()
         optimizer = _chromosome.optimizer()
         learningRate = _chromosome.learning_rate()
