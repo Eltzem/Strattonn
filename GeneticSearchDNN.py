@@ -28,7 +28,7 @@ class GeneticSearchDNN:
 
 
 
-    def searchVerbose (self, _saveDirectory, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None, _maxHL=None):
+    def searchVerbose (self, _saveDirectory, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None, _maxHL=None, _goodLoss = 0):
 
         # get training/testing data
         trainInputs, trainOutputs, testInputs, testOutputs = self.load_training_and_testing_data()
@@ -64,6 +64,19 @@ class GeneticSearchDNN:
                 losses.append(newDNN.evaluate(testInputs, testOutputs)[0])
                 print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
                 dnns.append(newDNN)
+
+                # NOTE: New. Extended training of 'good' models.
+                # checks if loss is 'good'. If so, train the model some more.
+                lossIndex = len(losses)-1
+                if losses[lossIndex] < _goodLoss:
+                    print('\nLoss is', losses[lossIndex], '. Training some more.\n')
+
+                    # train model more
+                    newDNN.train(trainInputs, trainOutputs, _epochs * 4, int(_batchSize / 4))
+                    # change loss
+                    losses[lossIndex] = newDNN.evaluate(testInputs, testOutputs)[0]
+
+                    print('\ntrained model:', x, 'with loss:', losses[lossIndex], '\n')
 
                 # save model
                 #if not os.path.exists('search-dnn-saves' + get_path_slash() + str(generationCount)):

@@ -67,6 +67,19 @@ class GeneticSearchDNN:
                 print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
                 dnns.append(newDNN)
 
+
+                # NOTE: New. Extended training of 'good' models.
+                # check if loss is 'good'. If so, train the model some more.
+                if losses[len(losses)-1] > 0.6:
+                    print('\nLoss is', losses[len(losses)-1], '. Training some more.\n')
+                    
+                    # train
+                    newDNN.train(trainInputs, trainOutputs, _epochs * 4, int(_batchSize / 4))
+                    # change loss
+                    losses[len(losses)-1] = newDNN.evaluate(testInputs, testOutputs)[1]
+
+                    print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
+
                 # save model
                 #if not os.path.exists('search-dnn-saves' + get_path_slash() + str(generationCount)):
                 #    os.mkdir('search-dnn-saves' + get_path_slash() + str(generationCount))
@@ -101,6 +114,7 @@ class GeneticSearchDNN:
             # make sure save directory exists
             if not os.path.exists(_saveDirectory):
                 os.mkdir(_saveDirectory)
+            #self.save_best_models(models, _numberToSave, _saveDirectory + get_path_slash() + str(generationCount), testInputs, testOutputs)
             self.save_best_models(models, _numberToSave, _saveDirectory + get_path_slash() + str(generationCount))
 
             # close models to prevent errors
@@ -278,6 +292,7 @@ class GeneticSearchDNN:
         return inputs, outputs
 
     # saves the best models of a generation to disk. Assumes _models is sorted
+    #def save_best_models (self, _models, _numberToSave, _directoryPath, _testInputs, _testOutputs):
     def save_best_models (self, _models, _numberToSave, _directoryPath):
         # save old current working directory
         oldPath = os.getcwd()
@@ -292,8 +307,17 @@ class GeneticSearchDNN:
         while modelIndex < _numberToSave and modelIndex < len(_models):
             # save model with example name: 0-fitness_0.034234123141234
             _models[modelIndex][2].save(str(modelIndex) + '-fitness_' + str(_models[modelIndex][0]))
-            modelIndex += 1
 
+
+            '''
+            # tests model weights
+            loadedDNN = DNN(_saveDirectory=str(modelIndex) + '-fitness_' + str(_models[modelIndex][0]))
+            loadedDNN.compile(loadedDNN.optimizer, 'categorical_hinge', _metrics=['categorical_accuracy'])
+            loss = loadedDNN.evaluate(_testInputs, _testOutputs)
+            print('loss of loaded model:', loss)
+            '''
+            modelIndex += 1
+        
         # restore old current working directory
         os.chdir(oldPath)
 

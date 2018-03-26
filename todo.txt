@@ -1,5 +1,1 @@
-add hidden layer limit to GNN start with initialPopulation (as a parameter)
-
-undo MNIST changes in master branch
-
 make GNN work with real data
