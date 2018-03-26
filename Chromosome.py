@@ -30,8 +30,8 @@ class Chromosome:
         self.maxHiddenLayers = _maxHL
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
 
-        self.minWindowCount = 1
-        self.maxWindowCount = 1 # arbitrary max
+        self.minWindowCount = 5
+        self.maxWindowCount = 5# arbitrary max
 
         self.inputsPerWindow = 5 # hour, minute, ln() - ln(), trendline, volume
 
@@ -156,6 +156,16 @@ class Chromosome:
     '''
     def get_genome (self):
         return self.genome
+
+    '''
+        Returns the genome list as a copy.
+    '''
+    def get_genome_copy (self):
+        genomeCopy = []
+        for element in self.genome:
+            genomeCopy.append(element)
+
+        return genomeCopy
 
     '''
         Returns string representation of the chromosome.

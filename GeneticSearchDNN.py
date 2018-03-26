@@ -1,5 +1,3 @@
-#TODO: add crossover, mutation functions. maybe put these in Chromosome class
-
 from Chromosome import Chromosome
 from DNN import DNN
 
@@ -9,13 +7,15 @@ import random
 import os
 import os.path
 
+#TODO: add in getting data for self.symbol to train with
+
 class GeneticSearchDNN:
 
 
-    def __init__ (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs, _generations, _symbol, _testPercentage=0.1):
+    def __init__ (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs, _testPercentage=0.1):
 
         # check whether search settings make sense
-        if not self.verifySearchSettings (_popSize, _selection, _mutation, _newblood, _crossoverPairs, _generations):
+        if not self.verify_search_settings (_popSize, _selection, _mutation, _newblood, _crossoverPairs):
             raise Exception ('Genetic Search __init__(): search settings do not agree')
 
         self.popSize = _popSize
@@ -23,79 +23,186 @@ class GeneticSearchDNN:
         self.mutation = _mutation
         self.newblood = _newblood
         self.crossoverPairs = _crossoverPairs
-        self.generations = _generations
-
-        self.symbol = _symbol # symbol to train data on
 
         self.testPercentage = _testPercentage # percentage of data to use for testing
 
 
 
-    def searchVerbose (self, _numberToSave, _epochs, _batchSize):
+    def searchVerbose (self, _saveDirectory, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None, _maxHL=None):
 
         # get training/testing data
-        trainInputs, trainOutputs, testInputs, testOutputs = self.loadTrainingAndTestingData(self.symbol)
+        trainInputs, trainOutputs, testInputs, testOutputs = self.load_training_and_testing_data()
 
         # initialize starting random Chromosomes
         chromosomes = []
         for x in range(self.popSize):
-            chromosomes.append(Chromosome())
+            newChromosome = Chromosome()
+            #print('inputs:', newChromosome.input_size())
+            chromosomes.append(Chromosome(_maxHL=_maxHL))
 
+        # if you want to start with a list of Chromosomes, pass them in with _initialPopuation
+        if _initialPopulation != None:
+            chromosomes = _initialPopulation
 
         # loop through generations
-        for generationCount in range(self.generations):
+        for generationCount in range(_generations):
             print('\n==========\nStarting New Generation:', generationCount, '\n==========\n')
+
+            # Work with Current Generation
 
             dnns = []
             losses = []
             # create, train, and evaluate DNNs
             for x in range(len(chromosomes)):
                 newDNN = DNN(_chromosome=chromosomes[x])
+
+                print('dnn:', newDNN.get_model().summary())
+
                 newDNN.compile(newDNN.optimizer, 'mean_squared_error')
                 newDNN.train(trainInputs, trainOutputs, _epochs, _batchSize)
                 
-                losses.append(newDNN.evaluate(testInputs, testOutputs))
+                losses.append(newDNN.evaluate(testInputs, testOutputs)[0])
                 print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
                 dnns.append(newDNN)
 
                 # save model
-                if not os.path.exists('search-dnn-saves' + get_path_slash() + str(generationCount)):
-                    os.mkdir('search-dnn-saves' + get_path_slash() + str(generationCount))
+                #if not os.path.exists('search-dnn-saves' + get_path_slash() + str(generationCount)):
+                #    os.mkdir('search-dnn-saves' + get_path_slash() + str(generationCount))
 
-                newDNN.save('search-dnn-saves' + get_path_slash() + str(generationCount) + get_path_slash() + \
-                            str(losses[x]) + 'fitness_chromosome-' + str(x))
+                #newDNN.save('search-dnn-saves' + get_path_slash() + str(generationCount) + get_path_slash() + \
+                #            str(losses[x]) + 'fitness_chromosome-' + str(x))
 
-                newDNN.close()
+                #newDNN.close()
 
             # aggregate all DNN data (loss, dnn, chromosome) into a list of tuples
+            print('aggregating model performance data')
             models = []
             for x in range(len(dnns)):
                 # add data to list of tuples for sorting
-                models.append((losses[x], dnns[x], chromosomes[x]))
+                models.append((losses[x], chromosomes[x], dnns[x]))
                 print('model for generation', generationCount, 'has loss', models[x][0])
+                print('mode:', models[x][1])
 
             # sort models based on loss
-            models = sorted(models, key=getSortedKey)
-            
+            print('\nsorting models by loss\n')
+            models = sorted(models, key=get_sorted_key)
+
             # save models
-            #print('\nsaving', _numberToSave, 'best models\n')
-            #self.saveBestModels(models, _numberToSave, 'search-dnn-saves' + get_path_slash() + str(generationCount))
+            print('\nsaving', _numberToSave, 'best models\n')
+            # make sure save directory exists
+            if not os.path.exists(_saveDirectory):
+                os.mkdir(_saveDirectory)
+            self.save_best_models(models, _numberToSave, _saveDirectory + get_path_slash() + str(generationCount))
 
             # close models to prevent errors
-            #for dnn in dnns:
-            #    dnn.close()
+            for dnn in dnns:
+                dnn.close()
 
-            # TODO: prepare next generation
+            # Prepare Next Generation
+
+            # new generation
+            newChromosomes = []
+
+            # selection
+            for x in range(self.selection):
+                print('\nadding selection\n')
+                # choose index to select
+                newChromosomes.append(chromosomes[self.tournament_selection(self.popSize)])
+                print('added:', newChromosomes[len(newChromosomes)-1])
+            
+            # mutation
+            for x in range(self.mutation):
+                print('\nadding mutation\n')
+                # choose index to mutate
+                index = self.tournament_selection(self.popSize)
+
+                # copy Chromosome before mutation
+                newChromosome = Chromosome(_genome=chromosomes[index].get_genome_copy(), _maxHL=4)
+
+                # mutate new Chromosome
+                newChromosome.mutate()
+
+                print('existing:', chromosomes[index])
+                
+                # add new Chromosome
+                newChromosomes.append(newChromosome)
+
+                print('added:', newChromosomes[len(newChromosomes)-1])
+                print('existing:', chromosomes[index])
+
+            # crossover
+            for x in range(self.crossoverPairs):
+                print('\nadding crossover\n')
+                
+                # choose indeces to mate
+                a = self.tournament_selection(self.popSize)
+                b = self.tournament_selection(self.popSize)
+
+                print('a:', chromosomes[a])
+                print('b:', chromosomes[b])
+
+                # add new crossovered Chromosomes
+                newChromosomes.append(self.crossover(chromosomes[a], chromosomes[b]))
+                print('added:', newChromosomes[len(newChromosomes)-1])
+                newChromosomes.append(self.crossover(chromosomes[a], chromosomes[b]))
+                print('added:', newChromosomes[len(newChromosomes)-1])
+
+            # newblood
+            for x in range(self.newblood):
+                print('\nadding newblood\n')
+                newChromosomes.append(Chromosome(_maxHL=_maxHL))
+                print('added:', newChromosomes[len(newChromosomes)-1])
+            
+
+            # set chromosome popuation as newly created population
+            chromosomes = newChromosomes
+
+    '''
+        Performs crossover on 2 Chromosomes.
+
+        Args:   _a = Chromosome
+                _b = Chromosome
+
+        Returns:    A Chromosome that is the crossover product of _a and _b.
+    '''
+    def crossover (self, _a, _b):
+        print('performing crossover')
+        genomeA = _a.get_genome()
+        genomeB = _b.get_genome()
+
+        index = random.randint(0, len(genomeA) - 1)
+
+        newGenome = genomeA[:index] + genomeB[index:]
+
+        return Chromosome(_genome=newGenome, _maxHL=_a.max_hidden_layers())
+
+    def tournament_selection (self, _max):
+
+        options = []
+
+        for x in range(int(_max * 0.05 + 1)):
+            options.append(random.randint(0, _max-1))
+
+        '''
+        a = random.randint(0, _max - 1)
+        b = random.randint(0, _max - 1)
+
+        if a < b:
+            return a
+        return b
+        '''
+
+        return sorted(options)[0]
+
+    # TODO: change these 2 functions to work with stock data once the inputs / outputs are ready
 
     # returns training and testing data for network. Randomizes it.
-    def loadTrainingAndTestingData (self, _symbol):
-        #TODO: inputs, outputs = loadData(_symbol)
+    # NOTE: using MNIST data
+    def load_training_and_testing_data (self):
+        inputs, outputs = self.load_data()
+        inputs = inputs.tolist()
+        outputs = outputs.tolist()
 
-        # just use dummy data for now
-        inputs = [[0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4], [0,1,2,3,4]] 
-
-        outputs = [[3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423], [3.423]] 
-        
         # randomize data
         data = list(zip(inputs, outputs))
         random.shuffle(data)
@@ -103,6 +210,9 @@ class GeneticSearchDNN:
 
         # index to split training and testing data on
         indexDivider = int(len(inputs) * self.testPercentage)
+        #print('indexDivider:', indexDivider)
+        testInputs = []
+        testOutputs = []
 
         # split data
         testInputs = inputs[:indexDivider]
@@ -111,10 +221,57 @@ class GeneticSearchDNN:
         trainInputs = inputs[indexDivider:]
         trainOutputs = outputs[indexDivider:]
 
+        print('testInputs:', len(testInputs))
+        print('testOutputs:', len(testOutputs))
+        print('trainInputs:', len(trainInputs))
+        print('trainOutputs:', len(trainOutputs))
+
+        #print(testInputs[2])
+        #print(testOutputs[2])
+        #print(trainInputs[2])
+        #print(trainOutputs[2])
+
         return trainInputs, trainOutputs, testInputs, testOutputs
 
+    # NOTE: load MNIST data
+    def load_data (self):
+        # retrieve mnist data
+        from keras.datasets import mnist
+        (input_train, output_train), (input_test, output_test) = mnist.load_data()
+
+        #print(input_train)
+
+        '''
+        inputs = input_train
+        for elemenet in input_test:
+            inputs.append(element)
+        outputs = output_train
+        for element in output_test:
+            outputs.append(output_test)
+        '''
+
+        inputs = input_train.tolist() + input_test.tolist()
+        outputs = output_train.tolist() + output_test.tolist()
+        
+        # flatten itmages (preprocessing)
+        print('flattening images')
+        from mnist import flatten_images
+        inputs = flatten_images(inputs)
+        print(inputs)
+
+        # expand outputs into 10 categories (preprocessing)
+        print('expanding outputs')
+        from mnist import expand_outputs
+        outputs = expand_outputs(outputs)
+        print(outputs)
+
+
+        print('inputs:', len(inputs))
+        print('outputs:', len(outputs))
+        return inputs, outputs
+
     # saves the best models of a generation to disk. Assumes _models is sorted
-    def saveBestModels (self, _models, _numberToSave, _directoryPath):
+    def save_best_models (self, _models, _numberToSave, _directoryPath):
         # save old current working directory
         oldPath = os.getcwd()
         
@@ -127,16 +284,16 @@ class GeneticSearchDNN:
         modelIndex = 0
         while modelIndex < _numberToSave and modelIndex < len(_models):
             # save model with example name: 0-fitness_0.034234123141234
-            _models[modelIndex][1].save(str(modelIndex) + '-fitness_' + str(_models[modelIndex][0]))
+            _models[modelIndex][2].save(str(modelIndex) + '-fitness_' + str(_models[modelIndex][0]))
             modelIndex += 1
 
         # restore old current working directory
         os.chdir(oldPath)
 
     # checks if search-wide variables make sense
-    def verifySearchSettings (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs, _generations):
+    def verify_search_settings (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs):
 
-        if _popSize < 0 or _selection < 0 or _mutation < 0 or _newblood < 0 or _crossoverPairs < 0 or _generations <= 0:
+        if _popSize < 0 or _selection < 0 or _mutation < 0 or _newblood < 0 or _crossoverPairs < 0:
             return False
         if _selection + _mutation + _newblood + (_crossoverPairs * 2) != _popSize:
             return False
@@ -144,9 +301,9 @@ class GeneticSearchDNN:
         return True
 
     # returns maing loss metric for DNN object with test inputs/outputs. Fitness of 0 is good, means 0 loss!
-    def getDNNFitness (self, _dnn, _inputs, _outputs):
+    def get_dnn_fitness (self, _dnn, _inputs, _outputs):
         return _dnn.evaluate(_inputs, _outputs)[0]
 
 # helps with sorting tuples that hold a population
-def getSortedKey (item):
+def get_sorted_key (item):
     return item[0]
