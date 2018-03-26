@@ -1,19 +1,16 @@
-import csv
-
+import copy
 
 class framePrepDnn:
 
-    def __init__(self,_filesymbol):
+    def framePrepDnn(_filesymbol):
         # [Volume, Trendline , Linear Regression, Hour, Minute]
-        # add times
-        self.frames = []
+        frames = []
+        skipcounter = 0
 
         filename = _filesymbol + "_data.csv"
-        #print("starting read of file: " + filename)
+        print("starting read of file: " + filename)
 
         with open(filename) as in_file:
-            filelength = sum(1 for _ in in_file)
-
             with open(filename) as csvr:
                 frame = []
                 for row in csvr:
@@ -24,7 +21,9 @@ class framePrepDnn:
                     if(len(frame)>4):
                         frame.pop(0)
                     frame.append(row)
-                    print(frame)
-
-
-                    self.frames.append(frame)
+                    flatframe = [item for sublist in frame for item in sublist]
+                    if skipcounter > 4:
+                        frames.append(copy.copy(flatframe))
+                    else:
+                        skipcounter+=1
+        return frames
