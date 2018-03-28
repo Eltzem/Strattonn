@@ -1,6 +1,3 @@
-import csvreader
-filename = "ANG.csv"
-test = csvreader.csvreader(filename)
-#print('[%s]' % "".join(map(str, test.aList)))
-
-
+import PreprocessCsv
+filename = "AAL.csv"
+test = PreprocessCsv.PreprocessCsv(filename)

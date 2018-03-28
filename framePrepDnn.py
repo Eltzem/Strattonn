@@ -1,11 +1,17 @@
 import copy
+import PreprocessCsv
+import csv
 
 class framePrepDnn:
 
+    # Call with Stock Symbol
     def framePrepDnn(_filesymbol):
-        # [Volume, Trendline , Linear Regression, Hour, Minute]
+        # call PreprocessCsv.py
+        # [Volume, PercentChange , Linear Regression, Hour, Minute]
         frames = []
+        outputs = []
         skipcounter = 0
+        PreprocessCsv.PreprocessCsv(_filesymbol + ".csv")
 
         filename = _filesymbol + "_data.csv"
         print("starting read of file: " + filename)
@@ -26,4 +32,10 @@ class framePrepDnn:
                         frames.append(copy.copy(flatframe))
                     else:
                         skipcounter+=1
+                with open('output.csv','w', newline='') as csvfile:
+                    spamwriter = csv.writer(csvfile, delimiter=' ',
+                                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                    spamwriter.writerow(frame)
+
+
         return frames
