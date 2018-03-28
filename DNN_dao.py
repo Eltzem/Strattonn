@@ -89,13 +89,21 @@ class DNN_dao:
         # restore current working directory
         os.chdir(oldPath)
 
-    # gets the loaded model
+    '''
+        Returns the loaded Keras model.
+
+        Returns:Model = Keras sequential model
+    '''
     def get_model (self):
         if self.model == None:
             raise Exception ('No model to return')
         return self.model
 
-    # gets the loaded chromosome
+    '''
+        Returns the loaded Chromosome object, if it exists.
+
+        Returns:Chromosome = Chromosome object
+    '''
     def get_chromosome (self):
         if self.chromosome == None:
             raise Exception ('No chromosome to return')

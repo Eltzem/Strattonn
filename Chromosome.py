@@ -98,6 +98,11 @@ class Chromosome:
         # output activation function
         self.genome.append(self.random_activation())
 
+    '''
+        Does any formatting that may be needed on the Chromosome. 'Slides' hidden layer information to the left of the list
+        to stick empty layers at the end.
+    '''
+
     def _format_genome (self):
         newGenome = []
 
@@ -128,6 +133,10 @@ class Chromosome:
     #tested 
     '''
         Load Chromosome from file.
+
+        Args:   string _filepath = relative path to file to load from
+
+        Returns:Chromosome = Chromosome loaded from file
     '''
     @staticmethod
     def load (_filepath):
@@ -141,7 +150,7 @@ class Chromosome:
 
     #tested
     '''
-        Save Chromosome.
+        Save Chromosome to a file.
     '''
     def save (self, _filepath):
         try:

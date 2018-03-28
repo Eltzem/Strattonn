@@ -14,6 +14,12 @@ class Chromosome_dao:
     def __init__ (self):
         self.chromosome = None
 
+    '''
+        Loads a Chromosome object from a file. Sets self.chromosome as the loaded Chromosome.
+
+        Args:   string _filepath = path to file to load from
+    '''
+
     def load (self, _filepath):
 
         print('loading chromosome from:', _filepath)
@@ -28,6 +34,14 @@ class Chromosome_dao:
             raise Exception ('Chromosome save file not present:', _filepath)
 
 
+    '''
+        Saves a Chromosome object to a file.
+
+        Args:   Chromosome _chromosome = Chromosome object to save.
+                string _filepath = path to save file to
+
+    '''
+
     def save (self, _chromosome, _filepath):
 
         print('saving chromosome to:', _filepath)
@@ -38,6 +52,12 @@ class Chromosome_dao:
         except Exception as e:
             print(str(e))
             raise e
+
+    '''
+        Gets the loaded Chromosome object.
+
+        Returns:Chromosome = self.chromosome
+    '''
 
     def get_chromosome (self):
         if self.chromosome == None:

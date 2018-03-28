@@ -32,7 +32,11 @@ def get_path_slash ():
 def get_time_interval_data_dir_path (_timeInterval):
     return 
 
-# tested
+'''
+    Gets the relative path to the folder holding formatted data files for a time series.
+
+    Returns:string = path to time series data folder
+'''
 def get_time_series_data_path (_timeSeries, _timeInterval=None):
     # extract subfolder name and add to dataDir
         # if intraday, use time interval (1min, 5min...)
@@ -45,7 +49,12 @@ def get_time_series_data_path (_timeSeries, _timeInterval=None):
     else:
         raise ValueError ('_timeSeries and _timeInterval are not compatible')
 
-# tested
+
+'''
+    Gets the relative path to the formatted data files for a stock symbol.
+
+    returns:string = path to symbol formatted data file
+'''
 def get_symbol_data_path (_symbol, _timeSeries, _timeInterval=None):
     # extract subfolder name and add to dataDir
         # if intraday, use time interval (1min, 5min...)
@@ -60,7 +69,12 @@ def get_symbol_data_path (_symbol, _timeSeries, _timeInterval=None):
     else:
         raise ValueError ('_timeSeries and _timeInterval are not compatible')
 
-# tested
+
+'''
+    Sames as get_symbol_data_path(), but removes .csv from the end.
+
+    Returns:string = path to symbol formatted data file minus .csv at the end
+'''
 def get_symbol_data (_symbol, _timeSeries, _timeInterval=None):
     # extract subfolder name and add to dataDir
         # if intraday, use time interval (1min, 5min...)

@@ -11,7 +11,16 @@ import os.path
 
 class GeneticSearchDNN:
 
+    '''
+        Initializes a GeneticSearchDNN object. Specify some main test parameters here.
 
+        Args:   int _popSizes = population size
+                int _selection = number selected each generation
+                int _mutation = number mutated each generation
+                int _newblood = number of newblood each generation
+                int _crossoverPairs = number of pairs to be mated each generation
+                float _testPercentage = (0, 1) ratio of total inputs and outputs to be used as test data
+    '''
     def __init__ (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs, _testPercentage=0.1):
 
         # check whether search settings make sense
@@ -27,8 +36,22 @@ class GeneticSearchDNN:
         self.testPercentage = _testPercentage # percentage of data to use for testing
 
 
+    '''
+        Conducts a genetic search on Chromosome objects representing DNNs.
 
-    def searchVerbose (self, _saveDirectory, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None, _maxHL=None, _goodLoss = 0):
+        Args:   string _saveDirectory = directory path to save best DNN and Chromosome objects for each generation
+                int _numberToSave = number of the best DNN objects to save each generation
+                int _generations = number of generation to conduct search for
+                int _epochs = base number of epochs to train each DNN for
+                int _batchSize = batch size for Keras training
+                Chromosome[] _initialPopulation = list of Chromosomes to use as the initial population. Max hidden layer count
+                                                    of each Chromosome must match _maxHL
+                int _maxHL = maximum number of hidden layers each Chromosome can represent
+                float _goodLoss = [0, 1) loss that a model become lower than to become considered 'good.' Good models will
+                                    be trained more.
+    '''
+    def searchVerbose (self, _saveDirectory, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None, \
+                        _maxHL=None, _goodLoss = 0):
 
         # get training/testing data
         trainInputs, trainOutputs, testInputs, testOutputs = self.load_training_and_testing_data()
@@ -189,6 +212,13 @@ class GeneticSearchDNN:
 
         return Chromosome(_genome=newGenome, _maxHL=_a.max_hidden_layers())
 
+    '''
+        Uses a tournament selection formula to select a probably low number comapred to the max.
+
+        Args:   int _max = maximum number that can be chosen. _max > 0
+
+        Retunrs:int = number [0, _max]
+    '''
     def tournament_selection (self, _max):
 
         options = []
@@ -206,6 +236,14 @@ class GeneticSearchDNN:
         '''
 
         return sorted(options)[0]
+
+    '''
+        Loads data for training and testing of models. Splits data so self.testPercentage is used as the percentage
+        of data for testing.
+
+        Returns:    4 lists. Each list contains the data described by the name in format: [ [0data0, 0data1, 0data2], [1data0, 1data1,
+                    1data2], ...]
+    '''
 
     # TODO: change these 2 functions to work with stock data once the inputs / outputs are ready
 
@@ -283,6 +321,14 @@ class GeneticSearchDNN:
         print('outputs:', len(outputs))
         return inputs, outputs
 
+    '''
+        Saves the best models of each generation.
+
+        Args:   list _models = List of DNN objects that represents the generation. Should be sorted so 'best' models are near front
+                                of list.
+                int _numberToSave = number of best models to save
+                _directory path = Path to store saved models for the generation
+    '''
     # saves the best models of a generation to disk. Assumes _models is sorted
     def save_best_models (self, _models, _numberToSave, _directoryPath):
         # save old current working directory
@@ -303,6 +349,13 @@ class GeneticSearchDNN:
         # restore old current working directory
         os.chdir(oldPath)
 
+    '''
+        Checks if the search settings specified in the constructor method work together.
+
+        Args: Genetic Search parameters
+
+        Returns:True/False  Search settings make sense/Search settings don't make sense
+    '''
     # checks if search-wide variables make sense
     def verify_search_settings (self, _popSize, _selection, _mutation, _newblood, _crossoverPairs):
 
