@@ -2,6 +2,11 @@ from Chromosome import Chromosome
 from DNN import DNN
 
 from Paths import get_path_slash
+from Paths import get_symbol_data_path
+from Paths import get_symbol_data
+
+from PreprocessCsv import PreprocessCsv
+from framePrepDnn import framePrepDnn
 
 import random
 import os
@@ -50,11 +55,14 @@ class GeneticSearchDNN:
                 float _goodLoss = [0, 1) loss that a model become lower than to become considered 'good.' Good models will
                                     be trained more.
     '''
-    def searchVerbose (self, _saveDirectory, _numberToSave, _generations, _epochs, _batchSize, _initialPopulation = None, \
+    def searchVerbose (self, _symbol, _timeSeries, _timeInterval, _saveDirectory, _numberToSave, \
+                        _generations, _epochs, _batchSize, _initialPopulation = None, \
                         _maxHL=None, _goodLoss = 0):
 
         # get training/testing data
-        trainInputs, trainOutputs, testInputs, testOutputs = self.load_training_and_testing_data()
+        trainInputs, trainOutputs, testInputs, testOutputs =  \
+            GeneticSearchDNN.load_training_and_testing_data(self.testPercentage, _symbol, \
+                                                            _timeSeries, _timeInterval)
 
         # initialize starting random Chromosomes
         chromosomes = []
@@ -88,7 +96,7 @@ class GeneticSearchDNN:
                 print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
                 dnns.append(newDNN)
 
-                # NOTE: New. Extended training of 'good' models.
+                # Extended training of 'good' models.
                 # checks if loss is 'good'. If so, train the model some more.
                 lossIndex = len(losses)-1
                 if losses[lossIndex] < _goodLoss:
@@ -248,11 +256,13 @@ class GeneticSearchDNN:
     # TODO: change these 2 functions to work with stock data once the inputs / outputs are ready
 
     # returns training and testing data for network. Randomizes it.
-    # NOTE: using MNIST data
-    def load_training_and_testing_data (self):
-        inputs, outputs = self.load_data()
-        inputs = inputs.tolist()
-        outputs = outputs.tolist()
+    @staticmethod
+    def load_training_and_testing_data (_testPercentage, _symbol, _timeSeries, _timeInterval=None):
+        print('loading training and testing data')
+
+        inputs, outputs = GeneticSearchDNN.load_data(_symbol, _timeSeries, _timeInterval)
+
+        print('\nsplitting and randomizing data\n')
 
         # randomize data
         data = list(zip(inputs, outputs))
@@ -260,7 +270,8 @@ class GeneticSearchDNN:
         inputs, outputs = zip(*data)
 
         # index to split training and testing data on
-        indexDivider = int(len(inputs) * self.testPercentage)
+        indexDivider = int(len(inputs) * _testPercentage)
+
         #print('indexDivider:', indexDivider)
         testInputs = []
         testOutputs = []
@@ -283,42 +294,35 @@ class GeneticSearchDNN:
         #print(trainOutputs[2])
 
         return trainInputs, trainOutputs, testInputs, testOutputs
+    
+    '''
+        Creates a calculated data file for a stock symbol data series. Loads the contents of
+        that file into inputs and outputs.
+    
+        Args:   string _symbol = stock symbol
+                string _timeSeries = AlphaVantage time series
+                string _timeInterval = optional AlphaVantage time interval (1min, 5min...)
 
-    # NOTE: load MNIST data
-    def load_data (self):
-        # retrieve mnist data
-        from keras.datasets import mnist
-        (input_train, output_train), (input_test, output_test) = mnist.load_data()
+        Returns:input and output data. Formatted the same as specified in the comment for
+                load_training_and_testing_data()
+    '''
 
-        #print(input_train)
+    @staticmethod
+    def load_data (_symbol, _timeSeries, _timeInterval=None):
+        print('\nloading data\n')
 
-        '''
-        inputs = input_train
-        for elemenet in input_test:
-            inputs.append(element)
-        outputs = output_train
-        for element in output_test:
-            outputs.append(output_test)
-        '''
+        # call PreprocessCsv class to generate data
+        print(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
+        c = PreprocessCsv(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
 
-        inputs = input_train.tolist() + input_test.tolist()
-        outputs = output_train.tolist() + output_test.tolist()
-        
-        # flatten itmages (preprocessing)
-        print('flattening images')
-        from mnist import flatten_images
-        inputs = flatten_images(inputs)
+
+        # get inputs and outputs from that file
+        inputs, outputs = \
+                        framePrepDnn.framePrepDnn(get_symbol_data(_symbol, _timeSeries, _timeInterval))
+
         print(inputs)
-
-        # expand outputs into 10 categories (preprocessing)
-        print('expanding outputs')
-        from mnist import expand_outputs
-        outputs = expand_outputs(outputs)
         print(outputs)
-
-
-        print('inputs:', len(inputs))
-        print('outputs:', len(outputs))
+        
         return inputs, outputs
 
     '''

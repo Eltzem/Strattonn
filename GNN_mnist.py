@@ -18,4 +18,4 @@ for x in range(3):
     startingPopulation.append(Chromosome())
 
 #gen.searchVerbose('search-dnn-mnist-1', 5, 5, 2, 1000, _initialPopulation=None, _maxHL=4)
-gen.searchVerbose('/media/will/data-160/search-dnn-mnist-100-30-15-15-20', 5, 30, 2, 1000, _initialPopulation=None, _maxHL=4)
+gen.searchVerbose('A', 'TIME_SERIES_INTRADAY', '1min','/media/will/data-160/search-dnn-mnist-100-30-15-15-20', 5, 30, 2, 1000, _initialPopulation=None, _maxHL=4, _goodLoss = 0.1)
