@@ -38,4 +38,8 @@ class framePrepDnn:
                     spamwriter.writerow(frame)
 
 
-        return frames
+        # Adding just the % change to an extra list: outputs
+        for row in frames:
+            outputs.append(copy.copy(row[1]))
+
+        return frames, outputs

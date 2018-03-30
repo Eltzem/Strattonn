@@ -27,7 +27,6 @@ class PreprocessCsv():
                         pastFive[0]=(row[6]) #7?
                     else:
                         pastFive.append((row[6])) #7?
-                        print(row[6])
 
                     # adding volume
                     outrow = []
