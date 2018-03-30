@@ -27,6 +27,8 @@ model.train(inputs, outputs, 10, 1)
 test_inputs = [[0,1,2,3,4], [1,2,3,4,5]]
 test_outputs = [[0], [1]]
 print('evaluation:', model.evaluate(test_inputs, test_outputs))
+print('evaluation w/ directional accuracy:', model.evaluate_directional_accuracy(test_inputs, \
+        test_outputs))
 
 prediction_inputs = [[2,3,4,5,6]]
 prediction_outputs = [[2]]

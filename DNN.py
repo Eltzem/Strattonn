@@ -204,20 +204,43 @@ class DNN:
 
         Args:   _inputs = inputs, same as defined in train()
                 _outputs = outputs, same as defined in train()
+                _directionalAccuracy = whether or not to include a percentage of times prediction
+                                        is on the same side of 0 as the true output
 
         Returns:    array containing loss metric and additional loss metrics for training data
     '''
-    def evaluate (self, _inputs, _outputs):
+    def evaluate (self, _inputs, _outputs, _directionalAccuracy=False):
         # make sure inputs and outputs are numpy.array (s)
         _inputs = np.array(_inputs)
         _outputs = np.array(_outputs)
 
-        return self.model.evaluate(x=_inputs, y=_outputs)
+        evaluation = self.model.evaluate(x=_inputs, y=_outputs)
+        return evaluation
+
+
+
+    def evaluate_directional_accuracy (self, _inputs, _outputs):
+        print(_inputs)
+        print(_outputs)
+
+        # loop through inputs and outputs. get predictions. see if ><0 matched ><0 of output
+        numCorrect = 0
+
+        for i in range(len(_inputs)):
+            prediction = self.predict([_inputs[i]])
+
+            if (prediction > 0 and _outputs[i][0] > 0) or (prediction <= 0 and _outputs[i][0] <= 0):
+                numCorrect += 1
+
+        # calculate directional accuracy percentage correct
+        percentageCorrect = numCorrect / len(_inputs)
+        return percentageCorrect
+
 
     '''
         Predicts outputs for an input series.
 
-        Args:   _inputs = [input0, input1, input2...]
+        Args:   _inputs = [ [input0, input1, input2...] ] 2D ARRAY NEEDED!
 
         Returns:    array containing a predicted value for each output
     '''
@@ -226,8 +249,8 @@ class DNN:
         _inputs = np.array(_inputs)
 
         # returns prediction as a single array
-            # NOTE: this may not work if we change the number of outputs. This is a 'cheat,' and the system may not behave
-            # like I think it does
+            # NOTE: this will not work if we change the number of outputs. This only returns the first
+            # output of the model.
 
         return self.model.predict(x=_inputs)[0]
 
