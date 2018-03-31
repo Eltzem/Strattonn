@@ -1,6 +1,8 @@
 from Chromosome import Chromosome
 from DNN import DNN
 
+from keras import backend as KerasBackend
+
 from Paths import get_path_slash
 from Paths import get_symbol_data_path
 from Paths import get_symbol_data
@@ -54,10 +56,12 @@ class GeneticSearchDNN:
                 int _maxHL = maximum number of hidden layers each Chromosome can represent
                 float _goodLoss = [0, 1) loss that a model become lower than to become considered 'good.' Good models will
                                     be trained more.
+                float _goodDA = [0, 1] directional accuracy that a model must be higher than to become considered 'good.'
+                                    Good models will be trained more.
     '''
     def searchVerbose (self, _symbol, _timeSeries, _timeInterval, _saveDirectory, _numberToSave, \
                         _generations, _epochs, _batchSize, _initialPopulation = None, \
-                        _maxHL=None, _goodLoss = 0):
+                        _maxHL=None, _goodLoss = 0, _goodDA = 1):
 
         # get training/testing data
         trainInputs, trainOutputs, testInputs, testOutputs =  \
@@ -70,8 +74,6 @@ class GeneticSearchDNN:
             newChromosome = Chromosome()
             #print('inputs:', newChromosome.input_size())
             chromosomes.append(Chromosome(_maxHL=_maxHL))
-
-        # if you want to start with a list of Chromosomes, pass them in with _initialPopuation
         if _initialPopulation != None:
             chromosomes = _initialPopulation
 
@@ -91,32 +93,30 @@ class GeneticSearchDNN:
 
                 newDNN.compile(newDNN.optimizer, 'mean_squared_error')
                 newDNN.train(trainInputs, trainOutputs, _epochs, _batchSize)
-                
-                losses.append(newDNN.evaluate(testInputs, testOutputs)[0])
-                print('\ntrained model:', x, 'with loss:', losses[len(losses)-1], '\n')
+               
+                loss, directionalAccuracy = self.get_dnn_fitness(newDNN, testInputs, testOutputs)
+                losses.append([loss, directionalAccuracy])
+                print('\ntrained model:', x, 'with loss:', loss, 'and directional accuracy:', \
+                        directionalAccuracy, '\n')
                 dnns.append(newDNN)
 
                 # Extended training of 'good' models.
                 # checks if loss is 'good'. If so, train the model some more.
-                lossIndex = len(losses)-1
-                if losses[lossIndex] < _goodLoss:
-                    print('\nLoss is', losses[lossIndex], '. Training some more.\n')
+                lastIndex = len(losses)-1
+                if losses[lastIndex][0] < _goodLoss or losses[lastIndex][1] > _goodDA:
+                    print('\nLoss is', losses[lastIndex][0], 'and directional accuracy is:', \
+                            losses[lastIndex][1], '. Training some more.\n')
 
                     # train model more
-                    newDNN.train(trainInputs, trainOutputs, _epochs * 4, int(_batchSize / 4))
+                    newDNN.train(trainInputs, trainOutputs, _epochs * 3, int(_batchSize / 2))
+                     
                     # change loss
-                    losses[lossIndex] = newDNN.evaluate(testInputs, testOutputs)[0]
+                    loss, directionalAccuracy = self.get_dnn_fitness(newDNN, testInputs, testOutputs)
+                    losses[lastIndex] = [loss, directionalAccuracy] 
 
-                    print('\ntrained model:', x, 'with loss:', losses[lossIndex], '\n')
+                    print('\ntrained model:', x, 'with loss:', loss, 'and directional accuracy:', \
+                            directionalAccuracy, '\n')
 
-                # save model
-                #if not os.path.exists('search-dnn-saves' + get_path_slash() + str(generationCount)):
-                #    os.mkdir('search-dnn-saves' + get_path_slash() + str(generationCount))
-
-                #newDNN.save('search-dnn-saves' + get_path_slash() + str(generationCount) + get_path_slash() + \
-                #            str(losses[x]) + 'fitness_chromosome-' + str(x))
-
-                #newDNN.close()
 
             # aggregate all DNN data (loss, dnn, chromosome) into a list of tuples
             print('aggregating model performance data')
@@ -130,6 +130,10 @@ class GeneticSearchDNN:
             # sort models based on loss
             print('\nsorting models by loss\n')
             models = sorted(models, key=get_sorted_key)
+            # reverse to use directional accuracy metric to sort, instead of error
+            newModels = []
+            for x in range(len(models)-1, -1, -1):
+                newModels.append(models[x])
 
             # save models
             print('\nsaving', _numberToSave, 'best models\n')
@@ -318,7 +322,7 @@ class GeneticSearchDNN:
 
         # get inputs and outputs from that file
         inputs, outputs = \
-                        framePrepDnn.framePrepDnn(get_symbol_data(_symbol, _timeSeries, _timeInterval))
+                    framePrepDnn.framePrepDnn(get_symbol_data(_symbol, _timeSeries, _timeInterval))
 
         print(inputs)
         print(outputs)
@@ -347,7 +351,8 @@ class GeneticSearchDNN:
         modelIndex = 0
         while modelIndex < _numberToSave and modelIndex < len(_models):
             # save model with example name: 0-fitness_0.034234123141234
-            _models[modelIndex][2].save(str(modelIndex) + '-fitness_' + str(_models[modelIndex][0]))
+            _models[modelIndex][2].save(str(modelIndex) + '-loss_' + str(_models[modelIndex][0][0]) + 'da_' + \
+                                        str(_models[modelIndex][0][1]))
             modelIndex += 1
 
         # restore old current working directory
@@ -372,8 +377,11 @@ class GeneticSearchDNN:
 
     # returns maing loss metric for DNN object with test inputs/outputs. Fitness of 0 is good, means 0 loss!
     def get_dnn_fitness (self, _dnn, _inputs, _outputs):
-        return _dnn.evaluate(_inputs, _outputs)[0]
+        loss = _dnn.evaluate(_inputs, _outputs) # assumes only 1 output
+        directionalAccuracy = _dnn.evaluate_directional_accuracy(_inputs, _outputs)
+
+        return loss, directionalAccuracy
 
 # helps with sorting tuples that hold a population
 def get_sorted_key (item):
-    return item[0]
+    return item[0][1]

@@ -14,8 +14,9 @@ startingPopulation.append(Chromosome(_genome=[28, 28, 'adam', 0, 500, 'sigmoid',
 startingPopulation.append(Chromosome(_genome=[28, 28, 'adam', 0, 500, 'softmax', 0, 500, 'sigmoid', 0, 500, 'softplus', 0, 0, 'hard_sigmoid', 0.4397462817710124, 0, 'hard_sigmoid', 0.3138025771867151, 0, 'softplus', 0.5779566775052997, 0, 'linear', 0.8054541031099068, 10, 'sigmoid']))
 '''
 
+'''
 for x in range(3):
     startingPopulation.append(Chromosome())
-
+'''
 #gen.searchVerbose('search-dnn-mnist-1', 5, 5, 2, 1000, _initialPopulation=None, _maxHL=4)
-gen.searchVerbose('A', 'TIME_SERIES_INTRADAY', '1min','/media/will/data-160/search-dnn-mnist-100-30-15-15-20', 5, 30, 2, 1000, _initialPopulation=None, _maxHL=4, _goodLoss = 0.1)
+gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min','/media/will/data-160/search-dnn-stock-100-30-15-15-20', _numberToSave=5, _generations=100, _epochs=3, _batchSize=100, _initialPopulation=None, _maxHL=4, _goodLoss = 0.01, _goodDA = 0.53)

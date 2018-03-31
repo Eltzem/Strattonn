@@ -22,7 +22,7 @@ class framePrepDnn:
                 for row in csvr:
                     row = row.rstrip()
                     row = row.split(",")
-                    map(float, row)
+                    row = list(map(float, row))
 
                     if(len(frame)>4):
                         frame.pop(0)
@@ -40,6 +40,6 @@ class framePrepDnn:
 
         # Adding just the % change to an extra list: outputs
         for row in frames:
-            outputs.append(copy.copy(row[1]))
+            outputs.append([float(copy.copy(row[1]))])
 
         return frames, outputs
