@@ -134,6 +134,7 @@ class GeneticSearchDNN:
             newModels = []
             for x in range(len(models)-1, -1, -1):
                 newModels.append(models[x])
+            models = newModels
 
             # save models
             print('\nsaving', _numberToSave, 'best models\n')
@@ -165,7 +166,7 @@ class GeneticSearchDNN:
                 index = self.tournament_selection(self.popSize)
 
                 # copy Chromosome before mutation
-                newChromosome = Chromosome(_genome=chromosomes[index].get_genome_copy(), _maxHL=4)
+                newChromosome = Chromosome(_genome=chromosomes[index].get_genome_copy(), _maxHL=_maxHL)
 
                 # mutate new Chromosome
                 newChromosome.mutate()
@@ -176,7 +177,7 @@ class GeneticSearchDNN:
                 newChromosomes.append(newChromosome)
 
                 print('added:', newChromosomes[len(newChromosomes)-1])
-                print('existing:', chromosomes[index])
+                #print('existing:', chromosomes[index])
 
             # crossover
             for x in range(self.crossoverPairs):

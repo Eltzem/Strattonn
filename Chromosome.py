@@ -94,8 +94,9 @@ class Chromosome:
             else:
                 self.genome.append(self.random_dropout())
 
-        self.HIDDEN_LAYER_END = len(self.genome) - 1 # save end of Hidden Layer sections. Right here the HL were the last thing added
-
+        # save end of Hidden Layer sections. Right here the HL were the last thing added
+        self.HIDDEN_LAYER_END = len(self.genome) - 1 
+        
         # output size
         self.genome.append(self.output_size())
         # output activation function
@@ -205,7 +206,6 @@ class Chromosome:
     '''
     def mutate (self):
         index = random.randint(0, len(self.genome) - 1)
-
         #print('mutation index:', index)
 
         newValue = None
@@ -244,6 +244,7 @@ class Chromosome:
 
         # apply change
         self.genome[index] = newValue
+
 
     # these functions generate random values based on pre-defined value constraints
 
