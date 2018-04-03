@@ -228,6 +228,7 @@ class DNN:
 
         for i in range(len(_inputs)):
             prediction = self.predict([_inputs[i]])
+            #print('prediction:', prediction, 'expected:', _outputs[i][0])
 
             if (prediction > 0 and _outputs[i][0] > 0) or (prediction <= 0 and _outputs[i][0] <= 0):
                 numCorrect += 1

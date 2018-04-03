@@ -42,7 +42,9 @@ class Chromosome:
         self.maxDropout = 0.2
 
         #self.possibleOptimizers = ['adam']
-        self.possibleOptimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
+        #self.possibleOptimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
+        # removed sgd from possible optimizers because it always gives 'nan' as loss
+        self.possibleOptimizers = ['rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
         
         self.minLearningRate = 0.01
         self.maxLearningRate = 0.01

@@ -4,7 +4,7 @@ from Chromosome import Chromosome
 for x in range(5, 6):
     try:
         gen = GeneticSearchDNN(100, 30, 15, 15, 20)
-        gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min','search-dnn-stock-100-30-15-15-20-' + str(x) + 'hl', _numberToSave=5, _generations=25, _epochs=3, _batchSize=100, _initialPopulation=None, _maxHL=x, _goodLoss = 0.01, _goodDA = 0.53)
+        gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min','search-dnn-stock-100-30-15-15-20-' + str(x) + 'hl', _numberToSave=5, _generations=25, _epochs=3, _batchSize=100, _initialPopulation=None, _maxHL=x, _goodLoss = 0.004, _goodDA = 0.53)
     except Exception as e:
         print('Exception found in hlsize = ', x)
         print(e)

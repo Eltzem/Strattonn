@@ -60,8 +60,8 @@ class GeneticSearchDNN:
                                     Good models will be trained more.
     '''
     def searchVerbose (self, _symbol, _timeSeries, _timeInterval, _saveDirectory, _numberToSave, \
-                        _generations, _epochs, _batchSize, _initialPopulation = None, \
-                        _maxHL=None, _goodLoss = 0, _goodDA = 1):
+                        _generations, _epochs, _batchSize, _maxHL, _initialPopulation = None, \
+                         _goodLoss = 0, _goodDA = 1):
 
         # get training/testing data
         trainInputs, trainOutputs, testInputs, testOutputs =  \
@@ -153,11 +153,17 @@ class GeneticSearchDNN:
             newChromosomes = []
 
             # selection
+            selected = []
             for x in range(self.selection):
                 print('\nadding selection\n')
                 # choose index to select
-                newChromosomes.append(chromosomes[self.tournament_selection(self.popSize)])
-                print('added:', newChromosomes[len(newChromosomes)-1])
+                selection = self.tournament_selection(_max = self.popSize)
+                while selection in selected:
+                    selection = self.tournament_selection(_max = self.popSize)
+
+                selected.append(selection)
+                newChromosomes.append(chromosomes[x])
+                print('added:', newChromosomes[len(newChromosomes)-1], 'index:', selection)
             
             # mutation
             for x in range(self.mutation):
@@ -288,10 +294,11 @@ class GeneticSearchDNN:
         trainInputs = inputs[indexDivider:]
         trainOutputs = outputs[indexDivider:]
 
-        print('testInputs:', len(testInputs))
-        print('testOutputs:', len(testOutputs))
+
         print('trainInputs:', len(trainInputs))
         print('trainOutputs:', len(trainOutputs))
+        print('testInputs:', len(testInputs))
+        print('testOutputs:', len(testOutputs))
 
         #print(testInputs[2])
         #print(testOutputs[2])
@@ -325,8 +332,8 @@ class GeneticSearchDNN:
         inputs, outputs = \
                     framePrepDnn.framePrepDnn(get_symbol_data(_symbol, _timeSeries, _timeInterval))
 
-        print(inputs)
-        print(outputs)
+        #print(inputs)
+        #print(outputs)
         
         return inputs, outputs
 
