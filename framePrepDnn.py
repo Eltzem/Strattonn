@@ -22,11 +22,8 @@ class framePrepDnn:
                 for row in csvr:
                     row = row.rstrip()
                     row = row.split(",")
-<<<<<<< HEAD
-                    a = map(float, row)
-=======
+                    
                     row = list(map(float, row))
->>>>>>> c04893b026886f269f825ea3d77580a2e2cb2a26
 
                     if(len(frame)>4):
                         frame.pop(0)
