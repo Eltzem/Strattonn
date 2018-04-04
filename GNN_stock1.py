@@ -25,7 +25,8 @@ for x in range(2, 10):
 
 #gen = GeneticSearchDNN(1, 1, 0, 0, 0, _testPercentage = 0.2)
 #gen = GeneticSearchDNN(10, 2, 2, 2, 2, _testPercentage = 0.2)
-gen = GeneticSearchDNN(40, 4, 12, 12, 6, _testPercentage = 0.2)
+#gen = GeneticSearchDNN(40, 4, 12, 12, 6, _testPercentage = 0.2)
+gen = GeneticSearchDNN(20, 6, 2, 2, 5, _testPercentage = 0.2)
 
 #startingPopulation = []
 #for x in range(1):
@@ -36,4 +37,6 @@ gen = GeneticSearchDNN(40, 4, 12, 12, 6, _testPercentage = 0.2)
 
 #gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min', 'search-dnn-VTI-short', _numberToSave=5, _generations=5, _epochs=2, _batchSize=100, _maxHL=4, _initialPopulation=startingPopulation, _goodLoss = 0.005, _goodDA = 0.53)
 
-gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min','search-dnn-stock-40-4-12-12-6-4hl', _numberToSave=5, _generations=100, _epochs=3, _batchSize=100, _maxHL=5, _initialPopulation=None, _goodLoss = 0.01, _goodDA = 0.53)
+#gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min','search-dnn-stock-40-4-12-12-6-5hl', _numberToSave=5, _generations=100, _epochs=3, _batchSize=100, _maxHL=5, _initialPopulation=None, _goodLoss = 0.01, _goodDA = 0.53)
+
+gen.searchVerbose('VTI', 'TIME_SERIES_INTRADAY', '1min','searches/search-dnn-stock-20-6-2-2-5-5hl', _numberToSave=5, _generations=100, _epochs=3, _batchSize=100, _maxHL=5, _initialPopulation=None, _goodLoss = 0.01, _goodDA = 0.53)

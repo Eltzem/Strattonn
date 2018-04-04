@@ -9,14 +9,14 @@ def create_model (_chromosome):
     return dnn
 
 def create_train_test_save_model (_chromosome):
-    dnn = create_model(c)
+    dnn = create_model(_chromosome)
 
     trainInputs, trainOutputs, testInputs, testOutputs = \
-            GSD.load_training_and_testing_data(0.2, 'AAPL', 'TIME_SERIES_INTRADAY', '1min')
+            GSD.load_training_and_testing_data(0.2, 'VTI', 'TIME_SERIES_INTRADAY', '1min')
 
-    dnn.compile(c.optimizer(), 'mean_squared_error')
+    dnn.compile(_chromosome.optimizer(), 'mean_squared_error')
 
-    dnn.train(trainInputs, trainOutputs, 30, 10)
+    dnn.train(trainInputs, trainOutputs, 200, 10)
 
     error = dnn.evaluate(testInputs, testOutputs)
     da = dnn.evaluate_directional_accuracy(testInputs, testOutputs)
@@ -35,6 +35,22 @@ def create_train_test_save_model (_chromosome):
 
 
 if __name__ == '__main__':
+    results = []
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=2)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=3)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=4)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=5)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=6)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=7)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=8)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=9)))
+    results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=10)))
+    
+    print(results)
+
+    '''
+    NOTE: This code was used to find the best optimizer. Results were mixed.
+
     d = Chromosome()
     results = {}
     for optimizer in d.possibleOptimizers:
@@ -49,3 +65,4 @@ if __name__ == '__main__':
     for optimizerKey in results:
         print('\n\nTrained model with optimizer:', optimizerKey, 'with mean' \
                 'squared error:', error, 'and directional accuracy:', da, '\n')
+    '''
