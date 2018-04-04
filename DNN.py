@@ -220,14 +220,15 @@ class DNN:
 
 
     def evaluate_directional_accuracy (self, _inputs, _outputs):
-        print(_inputs)
-        print(_outputs)
+        #print(_inputs)
+        #print(_outputs)
 
         # loop through inputs and outputs. get predictions. see if ><0 matched ><0 of output
         numCorrect = 0
 
         for i in range(len(_inputs)):
             prediction = self.predict([_inputs[i]])
+            #print('prediction:', prediction, 'expected:', _outputs[i][0])
 
             if (prediction > 0 and _outputs[i][0] > 0) or (prediction <= 0 and _outputs[i][0] <= 0):
                 numCorrect += 1

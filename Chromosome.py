@@ -36,15 +36,20 @@ class Chromosome:
         self.inputsPerWindow = 5 # hour, minute, ln() - ln(), trendline, volume
 
         self.minPerceptrons = 1
-        self.maxPerceptrons = 1000 # arbitrary max
+        self.maxPerceptrons = 100 # arbitrary max
 
         self.minDropout = 0
-        self.maxDropout = 1
+        self.maxDropout = 0.2
 
-        self.possibleOptimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
+        #self.possibleOptimizers = ['adam']
+        #self.possibleOptimizers = ['sgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
+        # removed sgd from possible optimizers because it always gives 'nan' as loss
+        self.possibleOptimizers = ['rmsprop', 'adagrad', 'adadelta', 'adam', 'adamax', 'nadam']
         
-        self.minLearningRate = 0.00001 # arbitrary min
-        self.maxLearningRate = 1 # arbitrary max
+        self.minLearningRate = 0.01
+        self.maxLearningRate = 0.01
+        #self.minLearningRate = 0.00001 # arbitrary min
+        #self.maxLearningRate = 0.1 # arbitrary max
         
         self.possibleActivations = ['softmax', 'elu', 'selu', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', \
                         'hard_sigmoid', 'linear']
@@ -91,8 +96,9 @@ class Chromosome:
             else:
                 self.genome.append(self.random_dropout())
 
-        self.HIDDEN_LAYER_END = len(self.genome) - 1 # save end of Hidden Layer sections. Right here the HL were the last thing added
-
+        # save end of Hidden Layer sections. Right here the HL were the last thing added
+        self.HIDDEN_LAYER_END = len(self.genome) - 1 
+        
         # output size
         self.genome.append(self.output_size())
         # output activation function
@@ -202,7 +208,6 @@ class Chromosome:
     '''
     def mutate (self):
         index = random.randint(0, len(self.genome) - 1)
-
         #print('mutation index:', index)
 
         newValue = None
@@ -242,6 +247,7 @@ class Chromosome:
         # apply change
         self.genome[index] = newValue
 
+
     # these functions generate random values based on pre-defined value constraints
 
     def random_window_count (self):
@@ -251,7 +257,7 @@ class Chromosome:
         return random.choice(self.possible_optimizers())
 
     def random_learning_rate (self):
-        return random.random () * self.max_learning_rate() + self.min_learning_rate()
+        return random.random () * (self.max_learning_rate() - self.min_learning_rate()) + self.min_learning_rate()
 
     def random_perceptron_count (self):
         return random.randint(self.min_perceptrons(), self.max_perceptrons())
@@ -260,7 +266,7 @@ class Chromosome:
         return random.choice(self.possible_activations())
 
     def random_dropout (self):
-        return random.random() * self.max_dropout() + self.min_dropout()
+        return random.random() * (self.max_dropout() - self.min_dropout()) + self.min_dropout()
 
 
     '''
