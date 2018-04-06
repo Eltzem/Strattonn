@@ -22,20 +22,19 @@ class framePrepDnn:
                 for row in csvr:
                     row = row.rstrip()
                     row = row.split(",")
+                    
                     row = list(map(float, row))
 
                     if(len(frame)>4):
                         frame.pop(0)
-                    frame.append(row)
+                    #frame.append(row)
+                    frame.append(a)
+                    print(a)
                     flatframe = [item for sublist in frame for item in sublist]
                     if skipcounter > 4:
                         frames.append(copy.copy(flatframe))
                     else:
                         skipcounter+=1
-                with open('output.csv','w', newline='') as csvfile:
-                    spamwriter = csv.writer(csvfile, delimiter=' ',
-                                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-                    spamwriter.writerow(frame)
 
 
         # Adding just the % change to an extra list: outputs
