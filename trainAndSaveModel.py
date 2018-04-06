@@ -12,11 +12,11 @@ def create_train_test_save_model (_chromosome):
     dnn = create_model(_chromosome)
 
     trainInputs, trainOutputs, testInputs, testOutputs = \
-            GSD.load_training_and_testing_data(0.2, 'VTI', 'TIME_SERIES_INTRADAY', '1min')
+            GSD.load_training_and_testing_data(0.2, 'MASTER', 'TIME_SERIES_INTRADAY', '1min')
 
     dnn.compile(_chromosome.optimizer(), 'mean_squared_error')
 
-    dnn.train(trainInputs, trainOutputs, 200, 10)
+    dnn.train(trainInputs, trainOutputs, 10, 1000)
 
     error = dnn.evaluate(testInputs, testOutputs)
     da = dnn.evaluate_directional_accuracy(testInputs, testOutputs)
@@ -35,6 +35,10 @@ def create_train_test_save_model (_chromosome):
 
 
 if __name__ == '__main__':
+
+    print((create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=5)))
+    '''
+    NOTE: this code was used to find the best hidden layer count. Results were mixed.
     results = []
     results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=2)))
     results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=3)))
@@ -47,6 +51,7 @@ if __name__ == '__main__':
     results.append(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=10)))
     
     print(results)
+    '''
 
     '''
     NOTE: This code was used to find the best optimizer. Results were mixed.

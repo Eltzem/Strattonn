@@ -35,8 +35,10 @@ class PreprocessCsv():
                     # Percent Change
                     pastFive = list(map(float, pastFive))
                     if len(pastFive)>1:
-                        percentIncrease = (pastFive[0] - pastFive[1]) / math.fabs(pastFive[0])*100
-                        outrow.append(percentIncrease)
+                        logReturns = math.log(pastFive[0], 2) - math.log(pastFive[1], 2)
+                        outrow.append(logReturns)
+                        #percentIncrease = (pastFive[0] - pastFive[1]) / math.fabs(pastFive[0])*100
+                        #outrow.append(percentIncrease)
 
 
                     # From list of stings to np array of ints

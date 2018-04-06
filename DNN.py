@@ -231,6 +231,7 @@ class DNN:
             #print('prediction:', prediction, 'expected:', _outputs[i][0])
 
             if (prediction > 0 and _outputs[i][0] > 0) or (prediction <= 0 and _outputs[i][0] <= 0):
+                #print('correct')
                 numCorrect += 1
 
         # calculate directional accuracy percentage correct
@@ -252,8 +253,8 @@ class DNN:
         # returns prediction as a single array
             # NOTE: this will not work if we change the number of outputs. This only returns the first
             # output of the model.
-
-        return self.model.predict(x=_inputs)[0]
+        #print(type(self.model.predict(x=_inputs)[0][0]))
+        return self.model.predict(x=_inputs)[0][0]
 
     #def get_layers(self):
     #    return self.layers
