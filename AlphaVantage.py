@@ -36,7 +36,7 @@ def _time_series_compatible (_timeSeries, _timeInterval=None):
 '''
 #tested
 def _create_url (_symbol, _timeSeries, _timeInterval=None, _apiKey = APIKEY):
-    print('_create_url(', _symbol, _timeSeries, _timeInterval, _apiKey, ')')
+    #print('_create_url(', _symbol, _timeSeries, _timeInterval, _apiKey, ')')
 
     url = ''
 
@@ -78,7 +78,7 @@ def _csv_line_extract_datetime (_line):
 #TODO make it work with other time series
 #tested
 def _format_csv (_filepath, _timeSeries):
-    print('_format_csv(', _filepath, ')')
+    #print('_format_csv(', _filepath, ')')
     
     # check if path exists
     if not os.path.exists(_filepath):
@@ -141,7 +141,7 @@ def _format_csv (_filepath, _timeSeries):
 '''
 #tested
 def _append_data (_filepathSource, _filepathTarget):
-    print('_append_data(', _filepathSource, _filepathTarget, ')')
+    #print('_append_data(', _filepathSource, _filepathTarget, ')')
 
     fileTarget = open(_filepathTarget, 'r')
     fileSource = open(_filepathSource, 'r')
@@ -185,7 +185,7 @@ def _append_data (_filepathSource, _filepathTarget):
 '''
 #tested
 def _download_error_occurred (_filepath):
-    print('_download_error_occurred(', _filepath, ')')
+    #print('_download_error_occurred(', _filepath, ')')
 
     if not os.path.exists(_filepath):
         print('\nFailed to download data csv: file does not exist\n')
@@ -224,8 +224,8 @@ def _download_error_occurred (_filepath):
 # tested
 def download_symbol_data (_dlDirectory, _filename, _timeout, _symbol, _timeSeries, _timeInterval=None, \
                             _apiKey=APIKEY):
-    print('download_symbol_data(', _dlDirectory, _filename, _symbol, _timeSeries, _timeInterval, \
-                            _apiKey, ')')
+    #print('download_symbol_data(', _dlDirectory, _filename, _symbol, _timeSeries, _timeInterval, \
+     #                       _apiKey, ')')
 
 
     # save current working directory
@@ -311,7 +311,7 @@ def download_symbol_data (_dlDirectory, _filename, _timeout, _symbol, _timeSerie
 '''
 #tested
 def update_symbol_data (_symbol, _timeSeries, _timeInterval=None, _timeout=100, apiKey=APIKEY):
-        print('update_symbol_data(', _symbol, _timeSeries, _timeInterval, apiKey, ')')
+        #print('update_symbol_data(', _symbol, _timeSeries, _timeInterval, apiKey, ')')
 
         print('Updating symbol data for:', _symbol, 'time series:', _timeSeries, 'timeinterval:', \
                 _timeInterval)

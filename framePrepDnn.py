@@ -27,9 +27,9 @@ class framePrepDnn:
 
                     if(len(frame)>4):
                         frame.pop(0)
-                    #frame.append(row)
-                    frame.append(a)
-                    print(a)
+                    frame.append(row)
+                    #frame.append(a)
+                    #print(a)
                     flatframe = [item for sublist in frame for item in sublist]
                     if skipcounter > 4:
                         frames.append(copy.copy(flatframe))

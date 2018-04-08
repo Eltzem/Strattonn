@@ -3,13 +3,13 @@ import os
 import os.path
 
 if __name__ == '__main__':
-    masterFile = csv.writer(open('MASTER.csv', 'w'))
+    masterFile = csv.writer(open('data/1min/MASTER.csv', 'w'))
 
     for filename in os.listdir():
         first = False
 
         if 'csv' in filename and filename != 'MASTER.csv' and not '_' in filename:
-            fromFile = csv.reader(open(filename))
+            fromFile = csv.reader(open('data/1min/' + filename))
         
             firstLine = next(fromFile)
 

@@ -10,13 +10,15 @@ from Paths import get_symbol_data
 from PreprocessCsv import PreprocessCsv
 from framePrepDnn import framePrepDnn
 
+from CreateAggregateInputOutputFiles import load_all_training_and_testing_data
+
 import random
 import os
 import os.path
 
 #TODO: add in getting data for self.symbol to train with
 
-class GeneticSearchDNN:
+class GeneticSearchDNNAll:
 
     '''
         Initializes a GeneticSearchDNN object. Specify some main test parameters here.
@@ -59,14 +61,13 @@ class GeneticSearchDNN:
                 float _goodDA = [0, 1] directional accuracy that a model must be higher than to become considered 'good.'
                                     Good models will be trained more.
     '''
-    def searchVerbose (self, _symbol, _timeSeries, _timeInterval, _saveDirectory, _numberToSave, \
-                        _generations, _epochs, _batchSize, _maxHL, _initialPopulation = None, \
-                         _goodLoss = 0, _goodDA = 1):
+    def searchVerbose (self, _symbol, _dataFolder,  _timeSeries, _timeInterval, _saveDirectory, \
+                        _numberToSave, _generations, _epochs, _batchSize, _maxHL, \
+                        _initialPopulation = None,  _goodLoss = 0, _goodDA = 1):
 
         # get training/testing data
         trainInputs, trainOutputs, testInputs, testOutputs =  \
-            GeneticSearchDNN.load_training_and_testing_data(self.testPercentage, _symbol, \
-                                                            _timeSeries, _timeInterval)
+            load_all_training_and_testing_data(self.testPercentage, _symbol, _dataFolder)
 
         # initialize starting random Chromosomes
         chromosomes = []

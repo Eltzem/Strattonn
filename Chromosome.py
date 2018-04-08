@@ -30,13 +30,14 @@ class Chromosome:
         self.maxHiddenLayers = _maxHL
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
 
-        self.minWindowCount = 5
-        self.maxWindowCount = 5# arbitrary max
+        self.minWindowCount = 115
+        self.maxWindowCount = 115 # arbitrary max
 
-        self.inputsPerWindow = 5 # hour, minute, ln() - ln(), trendline, volume
+        self.inputsPerWindow = 5 # only use for init_random(). This is later controlled by
+            # genome[0]
 
         self.minPerceptrons = 1
-        self.maxPerceptrons = 100 # arbitrary max
+        self.maxPerceptrons = 1000 # arbitrary max NOTE: modified for ALL aggregated search (575 inputs)
 
         self.minDropout = 0
         self.maxDropout = 0.2
@@ -59,12 +60,22 @@ class Chromosome:
         # Create random genome to start with at least
         self.init_random(_hlSizes=_hlSizes, _hlActivations=_hlActivations, _hlDropouts=_hlDropouts)
 
+        print('inputs before genome:', self.input_size())
+
         # if a genome was passed in, use it instead
         if _genome != None:
+            print('setting genome')
             self.genome = _genome
+
+        print('inputs before format:', self.input_size())
 
         # format the genome!
         self._format_genome()
+
+        print('\n\n\nChromosome input size:', self.input_size(), '\n\n\n')
+        print('window size:', self.window_size())
+        print('inputs per window:', self.inputs_per_window(), self.genome)
+
 
     '''
         Initializes a random Chromosome.
@@ -73,7 +84,7 @@ class Chromosome:
         # Initialize random genome
 
         self.genome.append(self.random_window_count())
-        self.genome.append(self.inputs_per_window())
+        self.genome.append(self.inputsPerWindow)
         self.genome.append(self.random_optimizer())
         self.genome.append(self.random_learning_rate())
 
@@ -285,6 +296,7 @@ class Chromosome:
         Returns window size of the DNN. This is the number of time periods fed as inputs to the network.
     '''
     def window_size (self):
+        print('window_size():', self.genome[0])
         return self.genome[0]
 
     '''
@@ -292,6 +304,7 @@ class Chromosome:
     '''
 
     def inputs_per_window (self):
+        print('inputs_per_window():', self.genome[1])
         return self.genome[1]
 
     '''
@@ -370,9 +383,6 @@ class Chromosome:
 
     def max_window_count (self):
         return self.maxWindowCount
-
-    def inputs_per_window (self):
-        return self.inputsPerWindow
 
     def min_perceptrons (self):
         return self.minPerceptrons
