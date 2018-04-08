@@ -30,8 +30,8 @@ class Chromosome:
         self.maxHiddenLayers = _maxHL
         self.HIDDEN_LAYER_START = 4 # first index of hidden layer information
 
-        self.minWindowCount = 115
-        self.maxWindowCount = 115 # arbitrary max
+        self.minWindowCount = 5
+        self.maxWindowCount = 5 # arbitrary max
 
         self.inputsPerWindow = 5 # only use for init_random(). This is later controlled by
             # genome[0]
