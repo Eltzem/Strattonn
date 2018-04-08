@@ -1,6 +1,6 @@
 *.swp*
 *__pycache__*
 *search-dnn-saves*
-*searches*
-*MASTER*
+searches/
+*MASTER*.csv
 dnn/
