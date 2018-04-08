@@ -1,4 +1,4 @@
-from GeneticSearchDNNAll import GeneticSearchDNNAll
+from GeneticSearchDNN import GeneticSearchDNN
 from Chromosome import Chromosome
 
 '''
