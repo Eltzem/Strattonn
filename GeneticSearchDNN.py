@@ -108,7 +108,7 @@ class GeneticSearchDNN:
                             losses[lastIndex][1], '. Training some more.\n')
 
                     # train model more
-                    newDNN.train(trainInputs, trainOutputs, _epochs * 3, int(_batchSize / 2))
+                    newDNN.train(trainInputs, trainOutputs, _epochs * 2, int(_batchSize / 2))
                      
                     # change loss
                     loss, directionalAccuracy = self.get_dnn_fitness(newDNN, testInputs, testOutputs)
