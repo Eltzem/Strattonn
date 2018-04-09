@@ -1,3 +1,1 @@
-test search on paper's DNN architectures
-
-test searches to eliminate plateaus
+craete text interface to load data, train model, and trade with it

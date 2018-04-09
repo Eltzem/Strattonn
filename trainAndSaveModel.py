@@ -1,4 +1,4 @@
-from GeneticSearchDNN import GeneticSearchDNN as GSD
+from LoadData import load_training_and_testing_data
 from DNN import DNN
 from Chromosome import Chromosome
 from Paths import get_path_slash
@@ -12,7 +12,7 @@ def create_train_test_save_model (_chromosome):
     dnn = create_model(_chromosome)
 
     trainInputs, trainOutputs, testInputs, testOutputs = \
-            GSD.load_training_and_testing_data(0.2, 'MASTER', 'TIME_SERIES_INTRADAY', '1min')
+            load_training_and_testing_data(0.2, 'VTI', 'TIME_SERIES_INTRADAY', '1min')
 
     dnn.compile(_chromosome.optimizer(), 'mean_squared_error')
 
@@ -36,7 +36,7 @@ def create_train_test_save_model (_chromosome):
 
 if __name__ == '__main__':
 
-    print((create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=5)))
+    print(create_train_test_save_model(Chromosome(_genome=[5, 5, 'nadam', 0.01, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 20, 'tanh', 0, 1, 'linear'], _maxHL=5)))
     '''
     NOTE: this code was used to find the best hidden layer count. Results were mixed.
     results = []

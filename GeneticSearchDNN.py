@@ -9,6 +9,7 @@ from Paths import get_symbol_data
 
 from PreprocessCsv import PreprocessCsv
 from framePrepDnn import framePrepDnn
+from LoadData import load_training_and_testing_data
 
 import random
 import os
@@ -65,7 +66,7 @@ class GeneticSearchDNN:
 
         # get training/testing data
         trainInputs, trainOutputs, testInputs, testOutputs =  \
-            GeneticSearchDNN.load_training_and_testing_data(self.testPercentage, _symbol, \
+            load_training_and_testing_data(self.testPercentage, _symbol, \
                                                             _timeSeries, _timeInterval)
 
         # initialize starting random Chromosomes
@@ -108,7 +109,7 @@ class GeneticSearchDNN:
                             losses[lastIndex][1], '. Training some more.\n')
 
                     # train model more
-                    newDNN.train(trainInputs, trainOutputs, _epochs * 3, int(_batchSize / 2))
+                    newDNN.train(trainInputs, trainOutputs, _epochs, _batchSize)
                      
                     # change loss
                     loss, directionalAccuracy = self.get_dnn_fitness(newDNN, testInputs, testOutputs)
@@ -255,83 +256,6 @@ class GeneticSearchDNN:
         '''
 
         return sorted(options)[0]
-
-    '''
-        Loads data for training and testing of models. Splits data so self.testPercentage is used as the percentage
-        of data for testing.
-
-        Returns:    4 lists. Each list contains the data described by the name in format: [ [0data0, 0data1, 0data2], [1data0, 1data1,
-                    1data2], ...]
-    '''
-
-    # TODO: change these 2 functions to work with stock data once the inputs / outputs are ready
-
-    # returns training and testing data for network. Randomizes it.
-    @staticmethod
-    def load_training_and_testing_data (_testPercentage, _symbol, _timeSeries, _timeInterval=None):
-        print('loading training and testing data')
-
-        inputs, outputs = GeneticSearchDNN.load_data(_symbol, _timeSeries, _timeInterval)
-
-        print('\nsplitting and randomizing data\n')
-
-        # randomize data
-        data = list(zip(inputs, outputs))
-        random.shuffle(data)
-        inputs, outputs = zip(*data)
-
-        # index to split training and testing data on
-        indexDivider = int(len(inputs) * _testPercentage)
-
-        # split data
-        testInputs = inputs[:indexDivider]
-        testOutputs = outputs[:indexDivider]
-
-        trainInputs = inputs[indexDivider:]
-        trainOutputs = outputs[indexDivider:]
-
-
-        print('trainInputs:', len(trainInputs))
-        print('trainOutputs:', len(trainOutputs))
-        print('testInputs:', len(testInputs))
-        print('testOutputs:', len(testOutputs))
-
-        #print(testInputs[2])
-        #print(testOutputs[2])
-        #print(trainInputs[2])
-        #print(trainOutputs[2])
-
-        return trainInputs, trainOutputs, testInputs, testOutputs
-    
-    '''
-        Creates a calculated data file for a stock symbol data series. Loads the contents of
-        that file into inputs and outputs.
-    
-        Args:   string _symbol = stock symbol
-                string _timeSeries = AlphaVantage time series
-                string _timeInterval = optional AlphaVantage time interval (1min, 5min...)
-
-        Returns:input and output data. Formatted the same as specified in the comment for
-                load_training_and_testing_data()
-    '''
-
-    @staticmethod
-    def load_data (_symbol, _timeSeries, _timeInterval=None):
-        print('\nloading data\n')
-
-        # call PreprocessCsv class to generate data
-        print(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
-        c = PreprocessCsv(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
-
-
-        # get inputs and outputs from that file
-        inputs, outputs = \
-                    framePrepDnn.framePrepDnn(get_symbol_data(_symbol, _timeSeries, _timeInterval))
-
-        #print(inputs)
-        #print(outputs)
-        
-        return inputs, outputs
 
     '''
         Saves the best models of each generation.
