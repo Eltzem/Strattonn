@@ -1,1 +1,3 @@
 craete text interface to load data, train model, and trade with it
+
+move search data back over here

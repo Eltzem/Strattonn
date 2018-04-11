@@ -29,9 +29,6 @@ def get_path_slash ():
         return '/'
 
 
-def get_time_interval_data_dir_path (_timeInterval):
-    return 
-
 '''
     Gets the relative path to the folder holding formatted data files for a time series.
 
