@@ -1,8 +1,15 @@
 from Paths import get_symbol_data_path
 from Paths import get_symbol_data
 from Paths import get_path_slash
+from Paths import get_symbol_train_data_path
+from Paths import get_symbol_test_data_path
+
 from framePrepDnn import framePrepDnn
 from PreprocessCsv import PreprocessCsv
+
+
+
+import csv
 
 import random
 import os
@@ -78,3 +85,67 @@ def load_data (_symbol, _timeSeries, _timeInterval=None):
     #print(outputs)
         
     return inputs, outputs
+
+
+'''
+    Splits a data file into training and testing data files. The last few
+    percent of the data file will be made into testing data to conduct
+    simulated trading with.
+'''
+#tested
+def split_data (_symbol, _timeSeries, _timeInterval, _testPercentage):
+    # open data file containing all time steps
+    f = open(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
+    wholeFile = csv.reader(f)
+
+    # extract data lines from csv
+    lines = []
+    for line in wholeFile:
+        lines.append(line)
+
+    f.close()
+
+    # seperate data
+    dividerIndex = int(len(lines) * _testPercentage)
+    testLines = [lines[0]] # add header to test data
+    trainLines = lines[:dividerIndex]
+    testLines += lines[dividerIndex:]
+
+    # append data to seperate training and testing csv files
+    f = open(get_symbol_train_data_path(_symbol, _timeSeries, _timeInterval), 'w')
+    trainCSV = csv.writer(f)
+
+    for line in trainLines:
+        trainCSV.writerow(line)
+
+    f.close()
+
+
+    f = open(get_symbol_test_data_path(_symbol, _timeSeries, _timeInterval), 'w')
+    testCSV = csv.writer(f)
+
+    for line in testLines:
+        testCSV.writerow(line)
+
+    f.close()
+
+'''
+    Loads split data files.
+'''
+#tested
+def load_split_data (_symbol, _timeSeries, _timeInterval, _testPercentage):
+    # split data
+    split_data(_symbol, _timeSeries, _timeInterval, _testPercentage)
+
+    # load data and calculate input and output data
+    trainInputs, trainOutputs = load_data(_symbol + '-TRAINSPLIT', _timeSeries, _timeInterval)
+    testInputs, testOutputs = load_data(_symbol + '-TESTSPLIT', _timeSeries, _timeInterval)
+
+    # randomize training data only. keep testing (trading) data in order
+    train = list(zip(trainInputs, trainOutputs))
+    random.shuffle(train)
+    trainInputs, trainOutputs = zip(*train)
+
+    # don't randomize testing data so we can simulate real trading
+
+    return trainInputs, trainOutputs, testInputs, testOutputs

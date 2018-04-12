@@ -11,17 +11,23 @@ def create_model (_chromosome):
 def create_train_test_save_model (_chromosome):
     dnn = create_model(_chromosome)
 
+    symbol = 'INX'
+
     trainInputs, trainOutputs, testInputs, testOutputs = \
-            load_training_and_testing_data(0.2, 'VTI', 'TIME_SERIES_INTRADAY', '1min')
+            load_training_and_testing_data(0.2, symbol, 'TIME_SERIES_INTRADAY', '1min')
+
+    print(trainOutputs)
+    print('\n\n\n\n\n\n\n\n\n\n\n')
+    print(testOutputs)
 
     dnn.compile(_chromosome.optimizer(), 'mean_squared_error')
 
-    dnn.train(trainInputs, trainOutputs, 10, 1000)
+    dnn.train(trainInputs, trainOutputs, 4, 100)
 
     error = dnn.evaluate(testInputs, testOutputs)
     da = dnn.evaluate_directional_accuracy(testInputs, testOutputs)
 
-    dnn.save('dnn' + get_path_slash() + str(da) + '_' + str(error))
+    dnn.save('dnn' + get_path_slash() + str(da) + '_' + str(error)) + '_' + symbol)
 
     dnn.close()
 

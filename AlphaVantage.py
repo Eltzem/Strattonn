@@ -21,6 +21,8 @@ def _time_series_compatible (_timeSeries, _timeInterval=None):
 
         if  ((_timeSeries == 'TIME_SERIES_INTRADAY' and _timeInterval != None) or \
                 (_timeSeries != 'TIME_SERIES_INTRADAY' and _timeInterval == None)):
+
+
             return True
 
         return False

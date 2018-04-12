@@ -85,3 +85,20 @@ def get_symbol_data (_symbol, _timeSeries, _timeInterval=None):
         return get_data_dir_path() + get_path_slash() + _timeSeries[12:].lower() + get_path_slash() + _symbol
     else:
         raise ValueError ('_timeSeries and _timeInterval are not compatible')
+
+'''
+	Returns the data  file path for the training data of a symbol if they are
+	split.
+'''
+def get_symbol_train_data_path (_symbol, _timeSeries, _timeInterval):
+    return get_symbol_data (_symbol, _timeSeries, _timeInterval) + '-TRAINSPLIT' \
+            + '.csv'
+
+'''
+	Returns the data file path for the testing data of a symbol if they are
+	split.
+'''
+def get_symbol_test_data_path (_symbol, _timeSeries, _timeInterval):
+    return get_symbol_data (_symbol, _timeSeries, _timeInterval) + '-TESTSPLIT' \
+            + '.csv'
+

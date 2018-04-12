@@ -118,7 +118,6 @@ class GeneticSearchDNN:
                     print('\ntrained model:', x, 'with loss:', loss, 'and directional accuracy:', \
                             directionalAccuracy, '\n')
 
-
             # aggregate all DNN data (loss, dnn, chromosome) into a list of tuples
             print('aggregating model performance data')
             models = []

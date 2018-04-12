@@ -35,7 +35,7 @@ class PreprocessCsv():
                     # Percent Change
                     pastFive = list(map(float, pastFive))
                     if len(pastFive)>1:
-                        logReturns = math.log(pastFive[0], 2) - math.log(pastFive[1], 2)
+                        logReturns = 1000000 * (math.log(pastFive[0], 2) - math.log(pastFive[1], 2))
                         outrow.append(logReturns)
                         #percentIncrease = (pastFive[0] - pastFive[1]) / math.fabs(pastFive[0])*100
                         #outrow.append(percentIncrease)

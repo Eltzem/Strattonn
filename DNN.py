@@ -233,6 +233,8 @@ class DNN:
             if (prediction > 0 and _outputs[i][0] > 0) or (prediction <= 0 and _outputs[i][0] <= 0):
                 #print('correct')
                 numCorrect += 1
+            #else:
+                #print('wrong')
 
         # calculate directional accuracy percentage correct
         percentageCorrect = numCorrect / len(_inputs)
