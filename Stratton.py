@@ -22,7 +22,7 @@ import os.path
 import csv
 
 # TODO update with real best Chromosome
-bestChromosome = Chromosome(_genome=[5, 5, 'adam', 0.01, 100, 'linear', 0.020142039851822835, 32, 'softmax', 0.11389427288630116, 78, 'selu', 0.19300485138497203, 43, 'softsign', 0.12657293241015408, 60, 'relu', 0.16140356082279383, 1, 'softsign'], _maxHL=5)
+bestChromosome = Chromosome(_genome=[5, 5, 'adam', 0.01, 88, 'softsign', 0.04576833916314136, 79, 'elu', 0.06757651750820325, 72, 'softmax', 0.0976546003775951, 66, 'relu', 0.15397405452066762, 87, 'sigmoid', 0.09760566738314312, 1, 'hard_sigmoid'], _maxHL=5)
 
 # from TradeBot import TradeBot
 

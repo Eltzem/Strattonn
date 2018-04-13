@@ -1,0 +1,30 @@
+All searches run with 40 Chromosomes, 8 selection, 8 mutation, 4 newblood, 10 crossover pairs, 
+and 5 epocs base training per model and batch size of 100.
+
+VTI 3hl
+	1. generation 3 0.9789
+
+AAPL 4hl
+	1. generation 15 0.6009
+
+AMD 4hl
+	1. generation 16 0.6209
+
+VTI 4hl
+	1. generation 20 0.9874
+
+AAPL 5hl
+	1. generation 0 0.6146
+
+INX 5hl
+	1. generation 16 0.9986
+
+VTI 5hl
+	1. generation 12 0.9723
+
+XOM 5hl
+	1. generation 15 0.8748
+
+VTI 6hl
+	1. generation 0 0.9590
+	
