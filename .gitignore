@@ -8,3 +8,4 @@ dnn/
 *.pyc
 *TRAINSPLIT*
 *TESTSPLIT*
+todo.txt

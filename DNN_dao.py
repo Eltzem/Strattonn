@@ -68,7 +68,7 @@ class DNN_dao:
 
         # check if path exists. if not, create it and go in
         if not os.path.exists(_directoryPath):
-            os.mkdir(_directoryPath)
+            os.makedirs(_directoryPath, exist_ok=True)
         os.chdir(_directoryPath)
 
         # save Chromosome if it exists

@@ -74,8 +74,8 @@ def load_data (_symbol, _timeSeries, _timeInterval=None):
 
     # call PreprocessCsv class to generate data
     print(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
+    
     c = PreprocessCsv(get_symbol_data_path(_symbol, _timeSeries, _timeInterval))
-
 
     # get inputs and outputs from that file
     inputs, outputs = \
