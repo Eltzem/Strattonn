@@ -208,7 +208,14 @@ def print_main_menu ():
     print('6 == Clear Current Model')
     print('0 == Quit')
 
-    return int(input('\nEnter the number for the option you want: '))
+    choice = input('\nEnter the number for the option you want: ')
+
+    try:
+        choice = int(choice)
+    except Exception as e:
+        choice = choice
+
+    return choice
 
 '''
     Main runtime loop for Stratton trading system.
