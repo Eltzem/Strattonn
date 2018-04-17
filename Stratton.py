@@ -21,8 +21,6 @@ import os.path
 
 import csv
 
-# TODO update with real best Chromosome
-bestChromosome = Chromosome(_genome=[5, 5, 'adadelta', 0.01, 88, 'softsign', 0.04576833916314136, 79, 'elu', 0.06757651750820325, 72, 'softmax', 0.0976546003775951, 66, 'relu', 0.15397405452066762, 87, 'sigmoid', 0.09760566738314312, 1, 'hard_sigmoid'], _maxHL=5)
 
 # from TradeBot import TradeBot
 
@@ -76,14 +74,49 @@ def load_model ():
 
     return dnn
 
-#TODO: make this give a different Chromosome for each symbol.
 '''
     Returns the best Chromosome for any symbol.
 
     Returns:Chromosome = best Chromosome for a symbol
 '''
-def _get_best_chromosome(_symbol):
-    return bestChromosome
+def _get_best_chromosome(_symbol, _timeSeries):
+    bestChromosome = [5, 5, 'adadelta', 0.01, 88, 'softsign', 0.04576833916314136, 79, 'elu', 0.06757651750820325, 72, 'softmax', 0.0976546003775951, 6, 'relu', 0.15397405452066762, 87, 'sigmoid', 0.09760566738314312, 1, 'hard_sigmoid']
+
+    # set bestChromosome based on which symbol and time series is used
+
+    if _symbol == 'VTI':
+        bestChromosome = [5, 5, 'rmsprop', 0.01, 93, 'softsign', 0.15362441542938934, 75, 'softmax', 0.1565223157066145, 55, 'tanh', 0.1393400382909604, 70, 'sigmoid', 0.026028148633672, 1, 'elu']
+        if not _timeSeries == 'TIME_SERIES_INTRADAY':
+            bestChromosome = [5, 5, 'nadam', 0.01, 78, 'softsign', 0.034350732448751246, 43, 'softsign', 0.18098339839165556, 35, 'sigmoid', 0.023275447336313128, 81, 'softsign', 0.05317601402309749, 54, 'sigmoid', 0.07678868150480041, 1, 'linear']
+            
+    elif _symbol == 'INX':
+        bestChromosome = [5, 5, 'adadelta', 0.01, 88, 'softsign', 0.04576833916314136, 79, 'elu', 0.06757651750820325, 72, 'softmax', 0.0976546003775951, 6, 'relu', 0.15397405452066762, 87, 'sigmoid', 0.09760566738314312, 1, 'hard_sigmoid'] 
+        if not _timeSeries == 'TIME_SERIES_INTRADAY':
+            bestChromosome = [5, 5, 'rmsprop', 0.01, 22, 'softmax', 0.17782560849448908, 48, 'selu', 0.15507248730671644, 9, 'sigmoid', 0.12337472952083328, 59, 'tanh', 0.0675181009874043, 8, 'hard_sigmoid', 0.06404924191773365, 1, 'softsign']
+    
+    elif _symbol == 'AAPL':
+        bestChromosome = [5, 5, 'adagrad', 0.01, 60, 'softsign', 0.17824595166912402, 94, 'selu', 0.015902688785115315, 47, 'softmax', 0.13297658472589025, 98, 'selu', 0.11169883639392125, 88, 'selu', 0.006811302164357991, 1, 'elu']
+        if not _timeSeries == 'TIME_SERIES_INTRADAY':
+            bestChromosome = [5, 5, 'nadam', 0.01, 12, 'selu', 0.18006180621861312, 35, 'softmax', 0.03039942057311953, 48, 'tanh', 0.19595967093603306, 39, 'relu', 0.17799425344700223, 15, 'sigmoid', 0.0494741191752359, 1, 'selu']
+    
+    elif _symbol == 'AMD':
+        bestChromosome = [5, 5, 'nadam', 0.01, 84, 'softsign', 0.18136838939868302, 51, 'softsign', 0.16795021897623255, 5, 'linear', 0.13899004035932758, 74, 'selu', 0.026186657211977528, 1, 'elu'] 
+        if not _timeSeries == 'TIME_SERIES_INTRADAY':
+            bestChromosome = bestChromosome # no search done for this one
+
+    elif _symbol == 'VTI':
+        bestChromosome = [5, 5, 'nadam', 0.01, 4, 'relu', 0.03677919272467345, 98, 'softsign', 0.013660965955586591, 11, 'softplus', 0.19106350430874144, 25, 'hard_sigmoid', 0.055009139864329384, 20, 'elu', 0.1744443475777589, 1, 'elu']
+        if not _timeSeries == 'TIME_SERIES_INTRADAY':
+            bestChromosome = [5, 5, 'adam', 0.01, 33, 'relu', 0.04787728882744513, 59, 'softmax', 0.09619899765104607, 25, 'elu', 0.01324936861316961, 88, 'relu', 0.19084488481047215, 3, 'softmax', 0.1268256558577213, 1, 'relu']
+
+    # rectify _maxHL in Chromosomes to match
+    print('MAKING CHROMOSOME')
+    sizes, dropouts, activations = Chromosome(_genome=bestChromosome).hidden_layers()
+    print('MADE CHROMOSOME')
+    maxHL = len(sizes)
+    print('GOT SIZES')
+
+    return Chromosome(_genome=bestChromosome, _maxHL=maxHL)
 
 '''
     Trains a model with user specified information.
@@ -116,7 +149,6 @@ def train_model (_dnn):
                         _dnn, epochs, batchSize)
     except FileNotFoundError as e:
         print(str(e), '\n\n')
-        print('\n\nData file not found!\n\n')
         return _dnn
     except Exception as e:
         print(str(e), '\n\n')
@@ -143,8 +175,8 @@ def _train_model (_symbol, _timeSeries, _timeInterval, \
             _symbol, _timeSeries, _timeInterval, _testPercentage)
 
     if _dnn == None:
-        _dnn = DNN(_chromosome=_get_best_chromosome(_symbol))
-        _dnn.compile(bestChromosome.optimizer(), 'mean_squared_error')
+        _dnn = DNN(_chromosome=_get_best_chromosome(_symbol, _timeSeries))
+        _dnn.compile(_dnn.get_chromosome().optimizer(), 'mean_squared_error')
 
     _dnn.train(trainInputs, trainOutputs, _epochs, _batchSize)
     
@@ -251,10 +283,15 @@ if __name__ == '__main__':
                 trade(currentDNN)
 
         elif choice == 6:
+            if not currentDNN == None:
+                currentDNN.close()
             currentDNN = None
 
         elif choice == 0:
             print('Quitting')
+
+            if not currentDNN == None:
+                currentDNN.close()
 
         else:
             print('\n\n', choice, 'is not a valid choice.\n\n')

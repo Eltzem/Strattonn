@@ -1,0 +1,28 @@
+This file contains results of genetic searches after the change.
+
+VTI
+1min: search-dnn-stock-40-8-8-4-10-5epochs-4hl-VTI/20/0-loss_994308.8077438123da_0.9874399704469893
+daily: search-dnn-stock-40-8-8-4-10-5epochs-5hl-VTI-daily/40/0-loss_227467134.54545453da_0.6446280991735537
+
+INX
+1min: search-dnn-stock-40-8-8-4-10-5epochs-5hl-INX/6/0-loss_1153927.0888429752da_1.0
+daily: search-dnn-stock-40-8-8-4-10-5epochs-5hl-INX-daily/16/0-loss_306492468.3572985da_0.5631808278867102
+
+AAPL
+1min: search-dnn-stock-40-15-20-5-0-5epochs-5hl-AAPL/70/0-loss_1981359.2187336644da_0.6790381599581808
+daily: search-dnn-stock-40-8-8-4-10-5epochs-5hl-AAPL-daily/92/0-loss_1223135528.2962964da_0.55119825708061
+
+AMD
+1min: search-dnn-stock-40-8-8-4-10-5epochs-4hl-AMD/16/0-loss_5384993.450349598da_0.6209461469800654
+
+XOM
+1min: search-dnn-stock-40-8-8-4-10-5epochs-5hl-XOM/15/0-loss_1030046.8275118285da_0.8747564709156693
+daily: search-dnn-stock-40-8-8-4-10-5epochs-5hl-XOM-daily/79/0-loss_494031838.6056645da_0.5403050108932462
+
+This section contains results of genetic searches before the change.
+
+VTI
+1min: search-dnn-stock-VTI-40-8-8-3-10-5-5hl/25/1-loss_0.000942809096120207da_0.5293683043960103
+
+Overall, probably AAPL
+1min: search-dnn-stock-ALL3910-40-8-8-8-8-5hl/53/0-loss_3.0161749225207574e-06da_0.5653846153846154
