@@ -189,7 +189,7 @@ def _train_model (_symbol, _timeSeries, _timeInterval, \
 '''
 def trade (_dnn):
 
-    symbol = input('\nEnter the stock symbol train model with: ')
+    symbol = input('\nEnter the stock symbol trade with: ')
     timeSeries = input('Enter the time series: ')
     timeInterval = input('Enter the time interval: ')
     if timeInterval == '':

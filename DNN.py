@@ -67,7 +67,7 @@ class DNN:
 
 
         hl_sizes, hl_activations, hl_dropouts = _chromosome.hidden_layers()
-        print('\n\n\nINPUT SIZE:', inputSize, '\n\n\n')
+        #print('\n\n\nINPUT SIZE:', inputSize, '\n\n\n')
         # add inputs
         self.add_dense(hl_sizes[0], hl_activations[0], _inputs = inputSize, _dropoutRate = hl_dropouts[0])
 

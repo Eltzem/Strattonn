@@ -60,21 +60,21 @@ class Chromosome:
         # Create random genome to start with at least
         self.init_random(_hlSizes=_hlSizes, _hlActivations=_hlActivations, _hlDropouts=_hlDropouts)
 
-        print('inputs before genome:', self.input_size())
+        #print('inputs before genome:', self.input_size())
 
         # if a genome was passed in, use it instead
         if _genome != None:
-            print('setting genome')
+            #print('setting genome')
             self.genome = _genome
 
-        print('inputs before format:', self.input_size())
+        #print('inputs before format:', self.input_size())
 
         # format the genome!
         self._format_genome()
 
-        print('\n\n\nChromosome input size:', self.input_size(), '\n\n\n')
-        print('window size:', self.window_size())
-        print('inputs per window:', self.inputs_per_window(), self.genome)
+        #print('\n\n\nChromosome input size:', self.input_size(), '\n\n\n')
+        #print('window size:', self.window_size())
+        #print('inputs per window:', self.inputs_per_window(), self.genome)
 
 
     '''
@@ -296,7 +296,7 @@ class Chromosome:
         Returns window size of the DNN. This is the number of time periods fed as inputs to the network.
     '''
     def window_size (self):
-        print('window_size():', self.genome[0])
+        #print('window_size():', self.genome[0])
         return self.genome[0]
 
     '''
@@ -304,7 +304,7 @@ class Chromosome:
     '''
 
     def inputs_per_window (self):
-        print('inputs_per_window():', self.genome[1])
+        #print('inputs_per_window():', self.genome[1])
         return self.genome[1]
 
     '''

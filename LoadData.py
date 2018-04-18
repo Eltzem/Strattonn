@@ -45,10 +45,10 @@ def load_training_and_testing_data (_testPercentage, _symbol, _timeSeries, _time
     trainOutputs = outputs[indexDivider:]
 
 
-    print('trainInputs:', len(trainInputs))
-    print('trainOutputs:', len(trainOutputs))
-    print('testInputs:', len(testInputs))
-    print('testOutputs:', len(testOutputs))
+    #print('trainInputs:', len(trainInputs))
+    #print('trainOutputs:', len(trainOutputs))
+    #print('testInputs:', len(testInputs))
+    #print('testOutputs:', len(testOutputs))
 
     #print(testInputs[2])
     #print(testOutputs[2])
@@ -105,8 +105,18 @@ def split_data (_symbol, _timeSeries, _timeInterval, _testPercentage):
 
     f.close()
 
+    # make sure _testPercentage is suffuciently away from 0 and 1
+    if _testPercentage < 0.05:
+        _testPercentage = 0.05
+    elif _testPercentage > 0.95:
+        _testPercentage = 0.95
+
+    # calculate training percentage from _testPercentage
+    trainPercentage = 1 - _testPercentage
+
     # seperate data
-    dividerIndex = int(len(lines) * _testPercentage)
+    dividerIndex = int(len(lines) * trainPercentage)
+
     testLines = [lines[0]] # add header to test data
     trainLines = lines[:dividerIndex]
     testLines += lines[dividerIndex:]
