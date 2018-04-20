@@ -97,14 +97,14 @@ def _get_best_chromosome(_symbol, _timeSeries):
     elif _symbol == 'AAPL':
         bestChromosome = [5, 5, 'adagrad', 0.01, 60, 'softsign', 0.17824595166912402, 94, 'selu', 0.015902688785115315, 47, 'softmax', 0.13297658472589025, 98, 'selu', 0.11169883639392125, 88, 'selu', 0.006811302164357991, 1, 'elu']
         if not _timeSeries == 'TIME_SERIES_INTRADAY':
-            bestChromosome = [5, 5, 'nadam', 0.01, 12, 'selu', 0.18006180621861312, 35, 'softmax', 0.03039942057311953, 48, 'tanh', 0.19595967093603306, 39, 'relu', 0.17799425344700223, 15, 'sigmoid', 0.0494741191752359, 1, 'selu']
+            bestChromosome = [5, 5, 'adagrad', 0.01, 60, 'softsign', 0.17824595166912402, 94, 'selu', 0.015902688785115315, 47, 'softmax', 0.13297658472589025, 98, 'selu', 0.11169883639392125, 88, 'selu', 0.006811302164357991, 1, 'elu']
     
     elif _symbol == 'AMD':
         bestChromosome = [5, 5, 'nadam', 0.01, 84, 'softsign', 0.18136838939868302, 51, 'softsign', 0.16795021897623255, 5, 'linear', 0.13899004035932758, 74, 'selu', 0.026186657211977528, 1, 'elu'] 
         if not _timeSeries == 'TIME_SERIES_INTRADAY':
             bestChromosome = bestChromosome # no search done for this one
 
-    elif _symbol == 'VTI':
+    elif _symbol == 'XOM':
         bestChromosome = [5, 5, 'nadam', 0.01, 4, 'relu', 0.03677919272467345, 98, 'softsign', 0.013660965955586591, 11, 'softplus', 0.19106350430874144, 25, 'hard_sigmoid', 0.055009139864329384, 20, 'elu', 0.1744443475777589, 1, 'elu']
         if not _timeSeries == 'TIME_SERIES_INTRADAY':
             bestChromosome = [5, 5, 'adam', 0.01, 33, 'relu', 0.04787728882744513, 59, 'softmax', 0.09619899765104607, 25, 'elu', 0.01324936861316961, 88, 'relu', 0.19084488481047215, 3, 'softmax', 0.1268256558577213, 1, 'relu']

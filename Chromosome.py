@@ -37,7 +37,7 @@ class Chromosome:
             # genome[0]
 
         self.minPerceptrons = 1
-        self.maxPerceptrons = 100 # arbitrary max NOTE: modified for ALL aggregated search (575 inputs)
+        self.maxPerceptrons = 100
 
         self.minDropout = 0
         self.maxDropout = 0.2
