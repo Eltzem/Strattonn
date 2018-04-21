@@ -57,12 +57,12 @@ def get_symbol_data_path (_symbol, _timeSeries, _timeInterval=None):
         # if intraday, use time interval (1min, 5min...)
         # if interday, use time series (daily, monthly...)
     if _timeSeries == 'TIME_SERIES_INTRADAY' and _timeInterval != None:
-        print(1)
+        #print(1)
         return get_data_dir_path() + get_path_slash() + _timeInterval + get_path_slash() + _symbol + \
             '.csv'
             
     elif _timeSeries != 'TIME_SERIES_INTRADAY' and _timeInterval == None:    
-        print(2)
+        #print(2)
         return get_data_dir_path() + get_path_slash() + _timeSeries[12:].lower() + get_path_slash() + _symbol + \
             '.csv'
     else:

@@ -21,6 +21,8 @@ import os.path
 
 import csv
 
+import warnings
+
 
 # from TradeBot import TradeBot
 
@@ -110,11 +112,11 @@ def _get_best_chromosome(_symbol, _timeSeries):
             bestChromosome = [5, 5, 'adam', 0.01, 33, 'relu', 0.04787728882744513, 59, 'softmax', 0.09619899765104607, 25, 'elu', 0.01324936861316961, 88, 'relu', 0.19084488481047215, 3, 'softmax', 0.1268256558577213, 1, 'relu']
 
     # rectify _maxHL in Chromosomes to match
-    print('MAKING CHROMOSOME')
+    #print('MAKING CHROMOSOME')
     sizes, dropouts, activations = Chromosome(_genome=bestChromosome).hidden_layers()
-    print('MADE CHROMOSOME')
+    #print('MADE CHROMOSOME')
     maxHL = len(sizes)
-    print('GOT SIZES')
+    #print('GOT SIZES')
 
     return Chromosome(_genome=bestChromosome, _maxHL=maxHL)
 
@@ -253,6 +255,8 @@ def print_main_menu ():
     Main runtime loop for Stratton trading system.
 '''
 if __name__ == '__main__':
+
+    warnings.filterwarnings("ignore")
 
     print('Welcome to the Stratton simluated stock trading system.')
 
