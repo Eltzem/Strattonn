@@ -1,3 +1,0 @@
-aggregate genetic search information
-
-change best chromosome for each symbol in Stratton.py
