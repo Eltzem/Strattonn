@@ -134,7 +134,12 @@ def train_model (_dnn):
     if timeInterval == '':
         timeInterval = None
     
-    testPercentage = float(input('Enter fraction of data to test with: '))
+    try:
+        testPercentage = float(input('Enter fraction of data to test with: '))
+    except Exception as e:
+        print("enter a valid number between 0 and 1\n\n\n")
+        print("\n\nError training model!\n\n")
+        return _dnn
 
     epochs = input('Enter epochs to train for (8): ')
     if epochs == '':
@@ -182,7 +187,7 @@ def _train_model (_symbol, _timeSeries, _timeInterval, \
 
     _dnn.train(trainInputs, trainOutputs, _epochs, _batchSize)
     
-    print('trained model directional accuracy:', _dnn.evaluate_directional_accuracy(testInputs, testOutputs))
+    print('\ntrained model directional accuracy:', _dnn.evaluate_directional_accuracy(testInputs, testOutputs))
     return _dnn
 
 #TODO add trading bot stuff in here
@@ -197,7 +202,12 @@ def trade (_dnn):
     if timeInterval == '':
         timeInterval = None
     
-    testPercentage = float(input('Enter fraction of data to trade with: '))
+    try:
+        testPercentage = float(input('Enter fraction of data to trade with: '))
+    except Exception as e:
+        print("enter a valid number between 0 and 1\n\n\n")
+        print("\n\nError trading!\n\n")
+        return
 
     try:
         _trade(symbol, timeSeries, timeInterval, testPercentage, _dnn)
@@ -225,7 +235,7 @@ def _trade (_symbol, _timeSeries, _timeInterval, _testPercentage, _dnn):
     # TODO add trade bot functions. Print directional accuracy for now
     # get predictions for trading part of split data
     results = _dnn.evaluate_directional_accuracy(testInputs, testOutputs)
-    print('results:', results)
+    print('\nmodel could trade with a directional accuracy of:', results)
     return results
 
 '''

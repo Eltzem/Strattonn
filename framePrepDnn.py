@@ -28,6 +28,7 @@ class framePrepDnn:
                     if(len(frame)>4):
                         frame.pop(0)
                     frame.append(row)
+                    #print(row)
                     #frame.append(a)
                     #print(a)
                     flatframe = [item for sublist in frame for item in sublist]
