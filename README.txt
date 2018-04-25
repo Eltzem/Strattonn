@@ -33,7 +33,7 @@ differences in operating system and stock symbol / time series.
 ==== Required Packages ====
 	The Python runtime is required to run Strattonn.py with at least version
 3.5. The pip package manager is recommended to install the Python libraries
-needed.
+needed. Packages can be installed with 'pip3 install <packagename>'
 
 	Required libraries:
 
@@ -119,7 +119,7 @@ time series: Space in between data points. A daily time series will have stock
 time interval: Leave this blank for time series other than TIME_SERIES_INTRADAY.
 	This is the subdivision of the intraday time series. Valid options for this
 	are 1min, 5min, 15min, 30min, 60min.
-fraction of data to test with: The fraction of data for that symbol and time
+fraction of data to evaluate with: The fraction of data for that symbol and time
 	series to use for testing, not training. The testing data is always the last
 	portion of the data and is kept in chronological order. Training data is
 	randomized. This should be a number between 0 and 1. Any choice less than
