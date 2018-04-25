@@ -265,10 +265,10 @@ def print_main_menu ():
     Main runtime loop for Stratton trading system.
 '''
 if __name__ == '__main__':
-
+    # turn off annoying warning messages that don't apply
     warnings.filterwarnings("ignore")
 
-    print('Welcome to the Stratton simluated stock trading system.')
+    print('\n\nWelcome to the Stratton simluated stock trading system.')
 
     currentDNN = None
     choice = -1
